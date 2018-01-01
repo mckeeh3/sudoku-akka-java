@@ -28,6 +28,6 @@ class BoxesActor extends AbstractLoggingActor {
     }
 
     static Props props() {
-        return Props.create(BoxesActor::new);
+        return Props.create(BoxesActor.class);
     }
 }

@@ -12,17 +12,19 @@ class BoardActor extends AbstractLoggingActor {
     private final ActorRef boxes;
 
     private BoardActor() {
-        cellsAssigned = getContext().actorOf(CellsAssignedActor.props());
-        cellsUnassigned = getContext().actorOf(CellsUnassignedActor.props());
-        rows = getContext().actorOf(RowsActor.props());
-        columns = getContext().actorOf(ColumnsActor.props());
-        boxes = getContext().actorOf(BoxesActor.props());
+        String namePrefix = getSelf().path().name();
+        cellsAssigned = getContext().actorOf(CellsAssignedActor.props(), namePrefix + "-cellsAssigned");
+        cellsUnassigned = getContext().actorOf(CellsUnassignedActor.props(), namePrefix + "-cellsUnassigned");
+        rows = getContext().actorOf(RowsActor.props(), namePrefix + "-rows");
+        columns = getContext().actorOf(ColumnsActor.props(), namePrefix + "-columns");
+        boxes = getContext().actorOf(BoxesActor.props(), namePrefix + "-boxes");
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
                 .match(SetCell.class, this::setCell)
+                .match(BoardState.AllCellsAssigned.class, this::allCellsAssigned)
                 .match(CellState.Invalid.class, this::cellInvalid)
                 .build();
     }
@@ -35,11 +37,16 @@ class BoardActor extends AbstractLoggingActor {
         boxes.tell(setCell, getSelf());
     }
 
+    private void allCellsAssigned(BoardState.AllCellsAssigned allCellsAssigned) {
+        log().info("All cells assigned");
+        getContext().getParent().tell(allCellsAssigned, getSelf());
+    }
+
     private void cellInvalid(CellState.Invalid invalid) {
         getContext().getParent().tell(new BoardState.Invalid(invalid), getSelf());
     }
 
     static Props props() {
-        return Props.create(BoardActor.class, BoardActor::new);
+        return Props.create(BoardActor.class);
     }
 }

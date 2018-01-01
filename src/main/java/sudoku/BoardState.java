@@ -19,4 +19,8 @@ interface BoardState {
             this.invalid = invalid;
         }
     }
+
+    class AllCellsAssigned implements Serializable {
+
+    }
 }

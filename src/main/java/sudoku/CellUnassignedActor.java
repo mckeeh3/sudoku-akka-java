@@ -60,10 +60,7 @@ class CellUnassignedActor extends AbstractLoggingActor {
     }
 
     private void trimPossibleValues(SetCell setCell) {
-        int i = possibleValues.indexOf(setCell.value);
-        if (i >= 0) {
-            possibleValues.remove(i);
-        }
+        possibleValues.removeIf(value -> value == setCell.value);
     }
 
     private void checkPossibleValues() {
@@ -79,7 +76,7 @@ class CellUnassignedActor extends AbstractLoggingActor {
     }
 
     private void cellSetByThisCell() {
-        String who = String.format("Cell row %d, col %d, value %d", row, col, possibleValues.get(0));
+        String who = String.format("Set by cell (%d, %d) = %d", row, col, possibleValues.get(0));
         getSender().tell(new SetCell(row, col, possibleValues.get(0), who), getSelf());
         getContext().stop(getSelf());
     }

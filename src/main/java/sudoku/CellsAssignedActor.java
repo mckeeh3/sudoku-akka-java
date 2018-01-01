@@ -32,7 +32,7 @@ class CellsAssignedActor extends AbstractLoggingActor {
     }
 
     static Props props() {
-        return Props.create(CellsAssignedActor::new);
+        return Props.create(CellsAssignedActor.class);
     }
 
     private String cellName(SetCell setCell) {

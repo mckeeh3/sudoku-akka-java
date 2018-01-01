@@ -3,7 +3,7 @@ package sudoku;
 import akka.actor.AbstractLoggingActor;
 import akka.actor.Props;
 
-public class RowsActor extends AbstractLoggingActor {
+class RowsActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
@@ -11,11 +11,21 @@ public class RowsActor extends AbstractLoggingActor {
                 .build();
     }
 
+    @Override
+    public void preStart() {
+        for (int row = 1; row <= 9; row++) {
+            for (int value = 1; value <= 9; value++) {
+                getContext().actorOf(RowActor.props(row, value));
+            }
+        }
+    }
+
     private void setCell(SetCell setCell) {
         log().debug("{}", setCell);
+        getContext().getChildren().forEach(row -> row.forward(setCell, getContext()));
     }
 
     static Props props() {
-        return Props.create(RowsActor::new);
+        return Props.create(RowsActor.class);
     }
 }

@@ -54,7 +54,8 @@ class BoxActor extends AbstractLoggingActor {
             monitoringComplete();
         } else if (monitoredCells.size() == 1) {
             Cell cell = monitoredCells.get(0);
-            getSender().tell(new SetCell(cell.row, cell.col, monitoredValue, ""), getSelf());
+            String who = String.format("Set by box (%d, %d) = %d", row, col, monitoredValue);
+            getSender().tell(new SetCell(cell.row, cell.col, monitoredValue, who), getSelf());
             monitoringComplete();
         }
     }

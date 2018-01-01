@@ -3,7 +3,7 @@ package sudoku;
 import akka.actor.AbstractLoggingActor;
 import akka.actor.Props;
 
-public class CellAssignedActor extends AbstractLoggingActor {
+class CellAssignedActor extends AbstractLoggingActor {
     private final int row;
     private final int col;
     private final int value;

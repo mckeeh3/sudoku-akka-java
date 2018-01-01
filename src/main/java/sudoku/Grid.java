@@ -1,9 +1,10 @@
 package sudoku;
 
+import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Objects;
 
-class Grid {
+class Grid implements Serializable {
     static class Cell {
         final int row;
         final int col;

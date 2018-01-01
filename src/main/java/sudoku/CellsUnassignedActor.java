@@ -28,15 +28,11 @@ class CellsUnassignedActor extends AbstractLoggingActor {
         if (getContext ().getChildren().iterator().hasNext()) {
             getContext ().getChildren().forEach(child -> child.tell(setCell, getSelf()));
         } else {
-            getContext().parent().tell(new AllCellsAssigned(), getSelf());
+            getContext().parent().tell(new BoardState.AllCellsAssigned(), getSelf());
         }
     }
 
     static Props props() {
-        return Props.create(CellsUnassignedActor::new);
-    }
-
-    static class AllCellsAssigned implements Serializable {
-
+        return Props.create(CellsUnassignedActor.class);
     }
 }
