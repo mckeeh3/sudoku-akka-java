@@ -17,6 +17,6 @@ class SetCell implements Serializable {
 
     @Override
     public String toString() {
-        return String.format("%s[%d, %d, %d, '%s']", getClass().getSimpleName(), row, col, value, who);
+        return String.format("%s[(%d, %d) = %d, '%s']", getClass().getSimpleName(), row, col, value, who);
     }
 }

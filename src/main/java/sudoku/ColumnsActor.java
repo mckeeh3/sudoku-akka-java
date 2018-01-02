@@ -15,7 +15,8 @@ class ColumnsActor extends AbstractLoggingActor {
     public void preStart() {
         for (int col = 1; col <= 9; col++) {
             for (int value = 1; value <= 9; value++) {
-                getContext().actorOf(ColumnActor.props(col, value));
+                String name = String.format("col-%d-value-%d", col, value);
+                getContext().actorOf(ColumnActor.props(col, value), name);
             }
         }
     }

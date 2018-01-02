@@ -36,11 +36,14 @@ class SudokuActor extends AbstractLoggingActor {
 
     @Override
     public void preStart() {
-        for (int row = 0; row < 9; row++) {
-            for (int col = 0; col < 9; col++) {
-                String who = String.format("Initialize cell (%d, %d) = %d", row, col, grid.cell(row, col).value);
-                SetCell setCell = new SetCell(row, col, grid.cell(row, col).value, who);
-                board.tell(setCell, getSelf());
+        for (int row = 1; row <= 9; row++) {
+            for (int col = 1; col <= 9; col++) {
+                int value = grid.cell(row, col).value;
+                if (value > 0) {
+                    String who = String.format("Initialize cell (%d, %d) = %d", row, col, value);
+                    SetCell setCell = new SetCell(row, col, value, who);
+                    board.tell(setCell, getSelf());
+                }
             }
         }
     }

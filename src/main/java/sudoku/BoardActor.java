@@ -30,6 +30,8 @@ class BoardActor extends AbstractLoggingActor {
     }
 
     private void setCell(SetCell setCell) {
+        log().debug("{}", setCell);
+
         cellsAssigned.tell(setCell, getSelf());
         cellsUnassigned.tell(setCell, getSelf());
         rows.tell(setCell, getSelf());

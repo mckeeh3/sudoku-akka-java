@@ -24,7 +24,7 @@ class RowActor extends AbstractLoggingActor {
     }
 
     @Override
-    public void preStart() throws Exception {
+    public void preStart() {
         for (int col = 1; col <= 9; col++) {
             monitoredCells.add(new Cell(row, col, monitoredValue));
         }

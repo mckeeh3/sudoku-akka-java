@@ -17,7 +17,8 @@ class CellsUnassignedActor extends AbstractLoggingActor {
     public void preStart() {
         for (int row = 1; row < 10; row++) {
             for (int col = 1; col < 10; col++) {
-                getContext().actorOf(CellUnassignedActor.props(row, col));
+                String name = String.format("unassigned-row-%d-col-%d", row, col);
+                getContext().actorOf(CellUnassignedActor.props(row, col), name);
             }
         }
     }
@@ -26,7 +27,7 @@ class CellsUnassignedActor extends AbstractLoggingActor {
         log().debug("{}", setCell);
 
         if (getContext ().getChildren().iterator().hasNext()) {
-            getContext ().getChildren().forEach(child -> child.tell(setCell, getSelf()));
+            getContext ().getChildren().forEach(child -> child.forward(setCell, getContext()));
         } else {
             getContext().parent().tell(new BoardState.AllCellsAssigned(), getSelf());
         }

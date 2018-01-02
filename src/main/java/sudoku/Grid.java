@@ -59,19 +59,19 @@ class Grid implements Serializable {
 
         cells = new Cells();
 
-        for (int row = 0; row < 9; row++) {
-            for (int col = 0; col < 9; col++) {
+        for (int row = 1; row <= 9; row++) {
+            for (int col = 1; col <= 9; col++) {
                 cells.cells.add(new Cell(row, col, cellValue(row, col, cellValues)));
             }
         }
     }
 
     Cell cell(int row, int col) {
-        return cells.cells.get(row * 9 + col);
+        return cells.cells.get((row - 1) * 9 + col - 1);
     }
 
     private int cellValue(int row, int col, String[] cellValues) {
-        String cellValue = cellValues[row * 9 + col];
+        String cellValue = cellValues[(row - 1) * 9 + col - 1];
         cellValue = cellValue.trim().isEmpty() ? "0" : cellValue.trim();
 
         return Integer.valueOf(cellValue);

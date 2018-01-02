@@ -23,7 +23,8 @@ class CellsAssignedActor extends AbstractLoggingActor {
             log().debug("Already assigned {}", setCell);
         } else {
             log().debug("Assign {}", setCell);
-            getContext().actorOf(CellAssignedActor.props(setCell.row, setCell.col, setCell.value, setCell.who));
+            String name = cellName(setCell);
+            getContext().actorOf(CellAssignedActor.props(setCell.row, setCell.col, setCell.value, setCell.who), name);
         }
     }
 
@@ -36,7 +37,7 @@ class CellsAssignedActor extends AbstractLoggingActor {
     }
 
     private String cellName(SetCell setCell) {
-        return String.format("%d-%d", setCell.row, setCell.col);
+        return String.format("assigned-row-%d-col-%d", setCell.row, setCell.col);
     }
 
     static class Clone implements Serializable {

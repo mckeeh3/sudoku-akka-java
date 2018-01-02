@@ -15,7 +15,8 @@ class RowsActor extends AbstractLoggingActor {
     public void preStart() {
         for (int row = 1; row <= 9; row++) {
             for (int value = 1; value <= 9; value++) {
-                getContext().actorOf(RowActor.props(row, value));
+                String name = String.format("row-%d-value-%d", row, value);
+                getContext().actorOf(RowActor.props(row, value), name);
             }
         }
     }
