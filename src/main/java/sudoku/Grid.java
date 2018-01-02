@@ -76,4 +76,23 @@ class Grid implements Serializable {
 
         return Integer.valueOf(cellValue);
     }
+
+    @Override
+    public String toString() {
+        String delimiter = "| ";
+        StringBuilder grid = new StringBuilder();
+        for (int row = 1; row <= 9; row++) {
+            grid.append("-------------------------------------\n");
+            for (int col = 1; col <= 9; col++) {
+                int value = cell(row, col).value;
+                grid.append(delimiter).append(value == 0 ? " " : value);
+                delimiter = " | ";
+            }
+            grid.append(" |\n");
+            delimiter = "| ";
+        }
+        grid.append("-------------------------------------\n");
+
+        return grid.toString();
+    }
 }

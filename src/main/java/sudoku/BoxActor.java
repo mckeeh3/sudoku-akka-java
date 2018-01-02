@@ -11,21 +11,14 @@ class BoxActor extends AbstractLoggingActor {
     private final int col;
     private final int monitoredValue;
     private List<Cell> monitoredCells = new ArrayList<>();
-
-    private final int rowLeft;
-    private final int rowRight;
-    private final int colTop;
-    private final int colBottom;
+    private final int boxIndex;
 
     BoxActor(int row, int col, int monitoredValue) {
         this.row = row;
         this.col = col;
         this.monitoredValue = monitoredValue;
 
-        rowLeft = row * 3 - 3 + 1;
-        rowRight = row * 3;
-        colTop = col * 3 - 3 + 1;
-        colBottom = col * 3;
+        boxIndex = boxFor(row, col);
     }
 
     @Override
@@ -37,9 +30,16 @@ class BoxActor extends AbstractLoggingActor {
 
     @Override
     public void preStart() {
-        for (int r = row * 3 - 3 + 1; r <= row * 3; r++) {
-            for (int c = col * 3 - 3 + 1; c < col * 3; c++) {
-                monitoredCells.add(new Cell(r, c, monitoredValue));
+//        for (int r = row * 3 - 3 + 1; r <= row * 3; r++) {
+//            for (int c = col * 3 - 3 + 1; c < col * 3; c++) {
+//                monitoredCells.add(new Cell(r, c, monitoredValue));
+//            }
+//        }
+        for (int r = 1; r <= 9; r++) {
+            for (int c = 1; c <= 9; c++) {
+                if (boxIndex == boxFor(r, c)) {
+                    monitoredCells.add(new Cell(r, c, monitoredValue));
+                }
             }
         }
     }
@@ -60,9 +60,14 @@ class BoxActor extends AbstractLoggingActor {
         }
     }
 
+    private int boxFor(int row, int col) {
+        int boxRow = (row - 1) / 3 + 1;
+        int boxCol = (col - 1) / 3 + 1;
+        return (boxRow - 1) * 3 + boxCol;
+    }
+
     private boolean isInBox(SetCell setCell) {
-        return setCell.row >= rowLeft && setCell.row <= rowRight
-                && setCell.col >= colTop && setCell.col <= colBottom;
+        return boxIndex == boxFor(setCell.row, setCell.col);
     }
 
     private boolean isSameCell(SetCell setCell, Cell cell) {

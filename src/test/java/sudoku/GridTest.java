@@ -23,6 +23,8 @@ class GridTest {
         assertEquals(2, grid.cell(1, 1).value);
         assertEquals(3, grid.cell(5, 6).value);
         assertEquals(4, grid.cell(9, 9).value);
+
+        System.err.println(grid);
     }
 
     @Test

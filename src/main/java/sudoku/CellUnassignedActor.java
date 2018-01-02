@@ -10,10 +10,12 @@ class CellUnassignedActor extends AbstractLoggingActor {
     private final int row;
     private final int col;
     private final List<Integer> possibleValues;
+    private final int boxIndex;
 
     private CellUnassignedActor(int row, int col) {
         this.row = row;
         this.col = col;
+        boxIndex = boxFor(row, col);
 
         possibleValues = new ArrayList<>();
 
@@ -56,7 +58,14 @@ class CellUnassignedActor extends AbstractLoggingActor {
     }
 
     private boolean isSameBox(SetCell setCell) {
-        return setCell.row / 3 == row / 3 && setCell.col / 3 == col / 3;
+//        return setCell.row / 3 == row / 3 && setCell.col / 3 == col / 3;
+        return boxIndex == boxFor(setCell.row, setCell.col);
+    }
+
+    private int boxFor(int row, int col) {
+        int boxRow = (row - 1) / 3 + 1;
+        int boxCol = (col - 1) / 3 + 1;
+        return (boxRow - 1) * 3 + boxCol;
     }
 
     private void trimPossibleValues(SetCell setCell) {
