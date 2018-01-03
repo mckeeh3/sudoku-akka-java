@@ -22,7 +22,6 @@ class ColumnsActor extends AbstractLoggingActor {
     }
 
     private void setCell(SetCell setCell) {
-        log().debug("{}", setCell);
         getContext().getChildren().forEach(child -> child.forward(setCell, getContext()));
     }
 

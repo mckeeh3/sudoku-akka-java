@@ -24,8 +24,6 @@ class CellsUnassignedActor extends AbstractLoggingActor {
     }
 
     private void setCell(SetCell setCell) {
-        log().debug("{}", setCell);
-
         if (getContext ().getChildren().iterator().hasNext()) {
             getContext ().getChildren().forEach(child -> child.forward(setCell, getContext()));
         } else {

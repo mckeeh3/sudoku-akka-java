@@ -24,7 +24,6 @@ class BoxesActor extends AbstractLoggingActor {
     }
 
     private void setCell(SetCell setCell) {
-        log().debug("{}", setCell);
         getContext().getChildren().forEach(box -> box.forward(setCell, getContext()));
     }
 

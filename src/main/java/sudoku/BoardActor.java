@@ -12,12 +12,11 @@ class BoardActor extends AbstractLoggingActor {
     private final ActorRef boxes;
 
     private BoardActor() {
-        String namePrefix = getSelf().path().name();
-        cellsAssigned = getContext().actorOf(CellsAssignedActor.props(), namePrefix + "-cellsAssigned");
-        cellsUnassigned = getContext().actorOf(CellsUnassignedActor.props(), namePrefix + "-cellsUnassigned");
-        rows = getContext().actorOf(RowsActor.props(), namePrefix + "-rows");
-        columns = getContext().actorOf(ColumnsActor.props(), namePrefix + "-columns");
-        boxes = getContext().actorOf(BoxesActor.props(), namePrefix + "-boxes");
+        cellsAssigned = getContext().actorOf(CellsAssignedActor.props(), "cellsAssigned");
+        cellsUnassigned = getContext().actorOf(CellsUnassignedActor.props(), "cellsUnassigned");
+        rows = getContext().actorOf(RowsActor.props(), "rows");
+        columns = getContext().actorOf(ColumnsActor.props(), "columns");
+        boxes = getContext().actorOf(BoxesActor.props(), "boxes");
     }
 
     @Override

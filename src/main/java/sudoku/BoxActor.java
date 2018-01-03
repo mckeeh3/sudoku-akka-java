@@ -18,7 +18,7 @@ class BoxActor extends AbstractLoggingActor {
         this.col = col;
         this.monitoredValue = monitoredValue;
 
-        boxIndex = boxFor(row, col);
+        boxIndex = (row - 1) * 3 + col;
     }
 
     @Override
@@ -30,11 +30,6 @@ class BoxActor extends AbstractLoggingActor {
 
     @Override
     public void preStart() {
-//        for (int r = row * 3 - 3 + 1; r <= row * 3; r++) {
-//            for (int c = col * 3 - 3 + 1; c < col * 3; c++) {
-//                monitoredCells.add(new Cell(r, c, monitoredValue));
-//            }
-//        }
         for (int r = 1; r <= 9; r++) {
             for (int c = 1; c <= 9; c++) {
                 if (boxIndex == boxFor(r, c)) {
@@ -45,6 +40,8 @@ class BoxActor extends AbstractLoggingActor {
     }
 
     private void setCell(SetCell setCell) {
+//        List<Cell> mc = new ArrayList<>(monitoredCells);
+
         removeCellFromBoxSameValue(setCell);
         removeCellFromBoxAnyValue(setCell);
         removeCellFromRow(setCell);
@@ -58,6 +55,11 @@ class BoxActor extends AbstractLoggingActor {
             getSender().tell(new SetCell(cell.row, cell.col, monitoredValue, who), getSelf());
             monitoringComplete();
         }
+
+//        if (monitoredCells.size() != mc.size()) {
+//            String msg = String.format("%s trimmed (%d)%s -> (%d)%s", setCell, mc.size(), mc, monitoredCells.size(), monitoredCells);
+//            log().debug("{}", msg);
+//        }
     }
 
     private int boxFor(int row, int col) {

@@ -31,8 +31,6 @@ class RowActor extends AbstractLoggingActor {
     }
 
     private void setCell(SetCell setCell) {
-        log().debug("{}", setCell);
-
         removeInRow(setCell);
         removeInCol(setCell);
         removeInBox(setCell);
