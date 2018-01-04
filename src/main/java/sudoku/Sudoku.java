@@ -31,7 +31,18 @@ public class Sudoku {
                         " , , , ,9,7,2, , ," +
                         "8, , , , ,4,5,9, ";
 
-        String gridValues = valuesMedium01;
+        final String valuesDifficult01 =
+                "         , , , ,5,9,7,4, ," +
+                        " , , , , , ,9, , ," +
+                        " ,8, ,4, , , , , ," +
+                        " ,9, ,2,8, , , ,3," +
+                        "4, , ,9, ,5, ,8, ," +
+                        "2, , , , ,3, , ,1," +
+                        " ,4, , ,6, , , , ," +
+                        " ,1, , , , , , , ," +
+                        "3,5,9,1, , , , ,6";
+
+        String gridValues = valuesDifficult01;
         Grid grid = new Grid(args.length == 0 ? gridValues : args[0]);
 
         ActorSystem actorSystem = ActorSystem.create("Sudoku");

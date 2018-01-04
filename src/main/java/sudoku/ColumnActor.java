@@ -24,16 +24,19 @@ class ColumnActor extends AbstractLoggingActor {
     }
 
     @Override
-    public void preStart() throws Exception {
+    public void preStart() {
         for (int row = 1; row <= 9; row++) {
             monitoredCells.add(new Cell(row, col, monitoredValue));
         }
     }
 
     private void setCell(SetCell setCell) {
-        removeInCol(setCell);
+        List<Cell> mc = new ArrayList<>(monitoredCells);
+
         removeInRow(setCell);
+        removeInCol(setCell);
         removeInBox(setCell);
+        removeInColAnyValue(setCell);
 
         if (monitoredCells.isEmpty()) {
             monitoringComplete();
@@ -42,6 +45,11 @@ class ColumnActor extends AbstractLoggingActor {
             String who = String.format("Set by column (%d, %d) = %d", cell.row, cell.col, monitoredValue);
             getSender().tell(new SetCell(cell.row, cell.col, monitoredValue, who), getSelf());
             monitoringComplete();
+        }
+
+        if (mc.size() != monitoredCells.size()) {
+            String msg = String.format("(%d)%s -> (%d)%s ", mc.size(), mc, monitoredCells.size(), monitoredCells);
+            log().debug("{} trimmed {}", setCell, msg);
         }
     }
 
@@ -61,6 +69,12 @@ class ColumnActor extends AbstractLoggingActor {
         getContext().stop(getSelf());
     }
 
+    private void removeInRow(SetCell setCell) {
+        if (isMonitoredValue(setCell)) {
+            monitoredCells.removeIf(cell -> isInRow(setCell, cell));
+        }
+    }
+
     private void removeInCol(SetCell setCell) {
         if (isInCol(setCell) && isMonitoredValue(setCell)) {
             monitoredCells = new ArrayList<>();
@@ -74,9 +88,9 @@ class ColumnActor extends AbstractLoggingActor {
         }
     }
 
-    private void removeInRow(SetCell setCell) {
-        if (isMonitoredValue(setCell)) {
-            monitoredCells.removeIf(cell -> isInRow(setCell, cell));
+    private void removeInColAnyValue(SetCell setCell) {
+        if (isInCol(setCell)) {
+            monitoredCells.removeIf(cell -> cell.row == setCell.row && cell.col == setCell.col);
         }
     }
 

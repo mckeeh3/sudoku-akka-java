@@ -34,6 +34,7 @@ class RowActor extends AbstractLoggingActor {
         removeInRow(setCell);
         removeInCol(setCell);
         removeInBox(setCell);
+        removeInRowAnyValue(setCell);
 
         if (monitoredCells.isEmpty()) {
             monitoringComplete();
@@ -67,6 +68,12 @@ class RowActor extends AbstractLoggingActor {
         }
     }
 
+    private void removeInCol(SetCell setCell) {
+        if (isMonitoredValue(setCell)) {
+            monitoredCells.removeIf(cell -> isInCol(setCell, cell));
+        }
+    }
+
     private void removeInBox(SetCell setCell) {
         if (isMonitoredValue(setCell)) {
             int setCellBox = boxFor(setCell);
@@ -74,9 +81,9 @@ class RowActor extends AbstractLoggingActor {
         }
     }
 
-    private void removeInCol(SetCell setCell) {
-        if (isMonitoredValue(setCell)) {
-            monitoredCells.removeIf(cell -> isInCol(setCell, cell));
+    private void removeInRowAnyValue(SetCell setCell) {
+        if (isInRow(setCell)) {
+            monitoredCells.removeIf(cell -> cell.row == setCell.row && cell.col == setCell.col);
         }
     }
 
