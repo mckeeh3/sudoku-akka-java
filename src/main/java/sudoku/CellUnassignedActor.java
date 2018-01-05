@@ -32,9 +32,8 @@ class CellUnassignedActor extends AbstractLoggingActor {
     }
 
     private void setCell(SetCell setCell) {
-        List<Integer> pv = new ArrayList<>(possibleValues);
-
-        log().debug("{} {}", setCell, possibleValues);
+//        List<Integer> pv = new ArrayList<>(possibleValues);
+//        log().debug("{} {}", setCell, possibleValues);
 
         if (isSameCell(setCell)) {
             cellSetByBoardRowColOrBox();
@@ -48,10 +47,10 @@ class CellUnassignedActor extends AbstractLoggingActor {
 
         checkPossibleValues();
 
-        if (possibleValues.size() != pv.size()) {
-            String msg = String.format("%s trimmed (%d)%s -> (%d)%s", setCell, pv.size(), pv, possibleValues.size(), possibleValues);
-            log().debug("{}", msg);
-        }
+//        if (possibleValues.size() != pv.size()) {
+//            String msg = String.format("%s trimmed (%d)%s -> (%d)%s", setCell, pv.size(), pv, possibleValues.size(), possibleValues);
+//            log().debug("{}", msg);
+//        }
     }
 
     private boolean isSameCell(SetCell setCell) {
