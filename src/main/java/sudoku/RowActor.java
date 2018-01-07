@@ -11,7 +11,7 @@ class RowActor extends AbstractLoggingActor {
     private final int monitoredValue;
     private List<Cell> monitoredCells = new ArrayList<>();
 
-    RowActor(int row, int monitoredValue) {
+    private RowActor(int row, int monitoredValue) {
         this.row = row;
         this.monitoredValue = monitoredValue;
     }

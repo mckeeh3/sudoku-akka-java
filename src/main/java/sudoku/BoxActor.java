@@ -13,7 +13,7 @@ class BoxActor extends AbstractLoggingActor {
     private List<Cell> monitoredCells = new ArrayList<>();
     private final int boxIndex;
 
-    BoxActor(int row, int col, int monitoredValue) {
+    private BoxActor(int row, int col, int monitoredValue) {
         this.row = row;
         this.col = col;
         this.monitoredValue = monitoredValue;

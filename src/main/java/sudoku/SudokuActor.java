@@ -8,7 +8,7 @@ class SudokuActor extends AbstractLoggingActor {
     private final Grid grid;
     private final ActorRef board;
 
-    SudokuActor(Grid grid) {
+    private SudokuActor(Grid grid) {
         this.grid = grid;
         board = getContext().actorOf(BoardActor.props(), "board-1");
     }

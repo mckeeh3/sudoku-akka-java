@@ -11,7 +11,7 @@ class ColumnActor extends AbstractLoggingActor {
     private final int monitoredValue;
     private List<Cell> monitoredCells = new ArrayList<>();
 
-    public ColumnActor(int col, int monitoredValue) {
+    private ColumnActor(int col, int monitoredValue) {
         this.col = col;
         this.monitoredValue = monitoredValue;
     }

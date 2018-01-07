@@ -9,7 +9,7 @@ class CellAssignedActor extends AbstractLoggingActor {
     private final int value;
     private final String who;
 
-    public CellAssignedActor(int row, int col, int value, String who) {
+    private CellAssignedActor(int row, int col, int value, String who) {
         this.row = row;
         this.col = col;
         this.value = value;
