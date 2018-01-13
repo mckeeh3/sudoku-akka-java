@@ -5,18 +5,17 @@ import akka.actor.ActorRef;
 import akka.actor.Props;
 
 class SudokuActor extends AbstractLoggingActor {
-    private final Grid grid;
-    private final ActorRef board;
+    private int boardNumber = 0;
 
     private SudokuActor(Grid grid) {
-        this.grid = grid;
-        board = getContext().actorOf(BoardActor.props(), "board-1");
+        initializeBoardFromGrid(grid);
     }
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
                 .match(BoardState.Solved.class, this::boardSolved)
+                .match(BoardState.Stalled.class, this::boardStalled)
                 .match(BoardState.Invalid.class, this::boardInvalid)
                 .match(BoardState.AllCellsAssigned.class, this::allCellsAssigned)
                 .build();
@@ -26,16 +25,25 @@ class SudokuActor extends AbstractLoggingActor {
         log().info("{}", solved);
     }
 
+    @SuppressWarnings("unused")
+    private void boardStalled(BoardState.Stalled stalled) {
+        log().info("Board stalled, sender {}", getSender());
+        ActorRef board = getContext().actorOf(BoardActor.props(), String.format("board-%d", ++boardNumber));
+        board.tell(new BoardState.Clone(getSender(), board), getSelf());
+    }
+
     private void boardInvalid(BoardState.Invalid invalid) {
         log().info("{}", invalid);
     }
 
+    @SuppressWarnings("unused")
     private void allCellsAssigned(BoardState.AllCellsAssigned allCellsAssigned) {
         log().info("All cells assigned");
     }
 
-    @Override
-    public void preStart() {
+    private void initializeBoardFromGrid(Grid grid) {
+        ActorRef board = getContext().actorOf(BoardActor.props(), String.format("board-%d", ++boardNumber));
+
         for (int row = 1; row <= 9; row++) {
             for (int col = 1; col <= 9; col++) {
                 int value = grid.cell(row, col).value;

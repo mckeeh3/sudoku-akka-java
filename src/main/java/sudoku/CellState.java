@@ -1,39 +1,25 @@
 package sudoku;
 
+import akka.actor.ActorRef;
+
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
 interface CellState {
-    class Assigned implements Serializable {
-        final int row;
-        final int col;
-        final int value;
-        final String who;
-
-        Assigned(int row, int col, int value, String who) {
-            this.row = row;
-            this.col = col;
-            this.value = value;
-            this.who = who;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s[(%d, %d) %s]", getClass().getSimpleName(), row, col, who);
-        }
-    }
-
-    class Unassigned implements Serializable {
+    class CloneUnassigned implements Serializable {
         final int row;
         final int col;
         final List<Integer> possibleValues;
+        final ActorRef boardStalled;
+        final ActorRef boardClone;
 
-        Unassigned(int row, int col) {
+        CloneUnassigned(int row, int col, List<Integer> possibleValues, ActorRef boardStalled, ActorRef boardClone) {
             this.row = row;
             this.col = col;
-
-            possibleValues = new ArrayList<>();
+            this.possibleValues = new ArrayList<>(possibleValues);
+            this.boardStalled = boardStalled;
+            this.boardClone = boardClone;
         }
 
         @Override
@@ -54,6 +40,19 @@ interface CellState {
         @Override
         public String toString() {
             return String.format("%s[(%d, %d)]", getClass().getSimpleName(), row, col);
+        }
+    }
+
+    class NoChange implements Serializable {
+        final SetCell setCell;
+
+        NoChange(SetCell setCell) {
+            this.setCell = setCell;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s[%s]", getClass().getSimpleName(), setCell);
         }
     }
 }

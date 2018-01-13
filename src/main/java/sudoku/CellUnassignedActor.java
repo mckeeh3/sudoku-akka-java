@@ -28,6 +28,7 @@ class CellUnassignedActor extends AbstractLoggingActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(SetCell.class, this::setCell)
+                .match(BoardState.CloneUnassigned.class, this::cloneUnassigned)
                 .build();
     }
 
@@ -37,15 +38,11 @@ class CellUnassignedActor extends AbstractLoggingActor {
 
         if (isSameCell(setCell)) {
             cellSetByBoardRowColOrBox();
-        } else if (isSameRow(setCell)) {
-            trimPossibleValues(setCell);
-        } else if (isSameCol(setCell)) {
-            trimPossibleValues(setCell);
-        } else if (isSameBox(setCell)) {
+        } else if (isSameRowColOrBox(setCell)) {
             trimPossibleValues(setCell);
         }
 
-        checkPossibleValues();
+        checkPossibleValues(setCell);
 
 //        if (possibleValues.size() != pv.size()) {
 //            String msg = String.format("%s trimmed (%d)%s -> (%d)%s", setCell, pv.size(), pv, possibleValues.size(), possibleValues);
@@ -55,6 +52,10 @@ class CellUnassignedActor extends AbstractLoggingActor {
 
     private boolean isSameCell(SetCell setCell) {
         return setCell.row == this.row && setCell.col == this.col;
+    }
+
+    private boolean isSameRowColOrBox(SetCell setCell) {
+        return isSameRow(setCell) || isSameCol(setCell) || isSameBox(setCell);
     }
 
     private boolean isSameRow(SetCell setCell) {
@@ -79,11 +80,13 @@ class CellUnassignedActor extends AbstractLoggingActor {
         possibleValues.removeIf(value -> value == setCell.value);
     }
 
-    private void checkPossibleValues() {
+    private void checkPossibleValues(SetCell setCell) {
         if (possibleValues.size() == 1) {
             cellSetByThisCell();
         } else if (possibleValues.isEmpty()) {
             cellIsInvalid();
+        } else {
+            getContext().getParent().tell(new CellState.NoChange(setCell), getSelf());
         }
     }
 
@@ -99,6 +102,10 @@ class CellUnassignedActor extends AbstractLoggingActor {
 
     private void cellIsInvalid() {
         getSender().tell(new CellState.Invalid(row, col), getSelf());
+    }
+
+    private void cloneUnassigned(BoardState.CloneUnassigned cloneUnassigned) {
+        cloneUnassigned.boardClone.tell(new CellState.CloneUnassigned(row, col, possibleValues, cloneUnassigned.boardStalled, cloneUnassigned.boardClone), getSelf());
     }
 
     static Props props(int row, int col) {

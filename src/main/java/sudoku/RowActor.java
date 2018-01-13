@@ -40,7 +40,7 @@ class RowActor extends AbstractLoggingActor {
             monitoringComplete();
         } else if (monitoredCells.size() == 1) {
             Cell cell = monitoredCells.get(0);
-            String who = String.format("Set by row (%d, %d) = %d", cell.row, cell.col, cell.value);
+            String who = String.format("Set by row (%d) = %d", row, cell.value);
             getSender().tell(new SetCell(cell.row, cell.col, monitoredValue, who), getSelf());
             monitoringComplete();
         }
