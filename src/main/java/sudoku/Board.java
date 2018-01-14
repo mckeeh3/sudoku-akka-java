@@ -4,7 +4,7 @@ import akka.actor.ActorRef;
 
 import java.io.Serializable;
 
-interface BoardState {
+interface Board {
     class Stalled implements Serializable {
         @Override
         public String toString() {

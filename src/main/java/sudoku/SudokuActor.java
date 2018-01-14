@@ -14,30 +14,30 @@ class SudokuActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(BoardState.Solved.class, this::boardSolved)
-                .match(BoardState.Stalled.class, this::boardStalled)
-                .match(BoardState.Invalid.class, this::boardInvalid)
-                .match(BoardState.AllCellsAssigned.class, this::allCellsAssigned)
+                .match(Board.Solved.class, this::boardSolved)
+                .match(Board.Stalled.class, this::boardStalled)
+                .match(Board.Invalid.class, this::boardInvalid)
+                .match(Board.AllCellsAssigned.class, this::allCellsAssigned)
                 .build();
     }
 
-    private void boardSolved(BoardState.Solved solved) {
+    private void boardSolved(Board.Solved solved) {
         log().info("{}", solved);
     }
 
     @SuppressWarnings("unused")
-    private void boardStalled(BoardState.Stalled stalled) {
+    private void boardStalled(Board.Stalled stalled) {
         log().info("Board stalled, sender {}", getSender());
         ActorRef board = getContext().actorOf(BoardActor.props(), String.format("board-%d", ++boardNumber));
-        board.tell(new BoardState.Clone(getSender(), board), getSelf());
+        board.tell(new Board.Clone(getSender(), board), getSelf());
     }
 
-    private void boardInvalid(BoardState.Invalid invalid) {
+    private void boardInvalid(Board.Invalid invalid) {
         log().info("{}", invalid);
     }
 
     @SuppressWarnings("unused")
-    private void allCellsAssigned(BoardState.AllCellsAssigned allCellsAssigned) {
+    private void allCellsAssigned(Board.AllCellsAssigned allCellsAssigned) {
         log().info("All cells assigned");
     }
 

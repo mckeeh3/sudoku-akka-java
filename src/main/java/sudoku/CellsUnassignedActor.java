@@ -28,7 +28,7 @@ class CellsUnassignedActor extends AbstractLoggingActor {
                 .match(SetCell.class, this::setCellStalled)
                 .match(CellState.NoChange.class, this::noChangeStalled)
                 .match(Terminated.class, this::cellStopped)
-                .match(BoardState.CloneUnassigned.class, this::cloneCells)
+                .match(Board.CloneUnassigned.class, this::cloneCells)
                 .build();
     }
 
@@ -52,7 +52,7 @@ class CellsUnassignedActor extends AbstractLoggingActor {
         if (getContext().getChildren().iterator().hasNext()) {
             getContext().getChildren().forEach(child -> child.forward(setCell, getContext()));
         } else {
-            getContext().parent().tell(new BoardState.AllCellsAssigned(), getSelf());
+            getContext().parent().tell(new Board.AllCellsAssigned(), getSelf());
             getContext().become(solved);
         }
 
@@ -91,12 +91,12 @@ class CellsUnassignedActor extends AbstractLoggingActor {
         if (cellCountNoChange >= cellCount) {
             log().debug("Cells stalled, cell unsolved {} stalled {}", cellCount, cellCountNoChange);
 
-            getContext().getParent().tell(new BoardState.Stalled(), getSelf());
+            getContext().getParent().tell(new Board.Stalled(), getSelf());
             getContext().become(stalled);
         }
     }
 
-    private void cloneCells(BoardState.CloneUnassigned cloneUnassigned) {
+    private void cloneCells(Board.CloneUnassigned cloneUnassigned) {
         log().debug("{}", cloneUnassigned);
         getContext().getChildren().forEach(child -> child.tell(cloneUnassigned, getSelf()));
     }

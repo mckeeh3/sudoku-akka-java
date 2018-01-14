@@ -13,6 +13,6 @@ class Cell {
 
     @Override
     public String toString() {
-        return String.format("%s[(%d, %d) %d]", getClass().getSimpleName(), row, col, value);
+        return String.format("%s[(%d, %d) = %d]", getClass().getSimpleName(), row, col, value);
     }
 }

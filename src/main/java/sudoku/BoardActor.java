@@ -29,11 +29,6 @@ class BoardActor extends AbstractLoggingActor {
         State(String state) {
             this.state = state;
         }
-
-//        @Override
-//        public String toString() {
-//            return state;
-//        }
     }
 
     {
@@ -45,16 +40,18 @@ class BoardActor extends AbstractLoggingActor {
 
         running = receiveBuilder()
                 .match(SetCell.class, this::setCell)
-                .match(BoardState.AllCellsAssigned.class, this::allCellsAssigned)
+                .match(Board.AllCellsAssigned.class, this::allCellsAssigned)
                 .match(CellState.Invalid.class, this::cellInvalid)
-                .match(BoardState.Stalled.class, this::boardStalled)
-                .match(BoardState.Clone.class, this::boardClone)
+                .match(Board.Stalled.class, this::boardStalled)
+                .match(Board.Clone.class, this::boardClone)
                 .match(CellState.CloneUnassigned.class, this::cloneUnassignedIgnore)
+                .match(Validate.Valid.class, this::boardValid)
                 .build();
 
         solved = receiveBuilder()
                 .match(SetCell.class, this::setCellNotRunning)
-                .match(BoardState.AllCellsAssigned.class, this::allCellsAssignedSolved)
+                .match(Board.AllCellsAssigned.class, this::allCellsAssignedSolved)
+                .match(Validate.Board.class, this::validateBoard)
                 .build();
 
         failed = receiveBuilder()
@@ -62,14 +59,14 @@ class BoardActor extends AbstractLoggingActor {
                 .build();
 
         stalled = receiveBuilder()
-                .match(BoardState.CloneUnassigned.class, this::boardStalledCloneUnassigned)
-                .match(BoardState.CloneAssigned.class, this::boardStalledCloneAssigned)
+                .match(Board.CloneUnassigned.class, this::boardStalledCloneUnassigned)
+                .match(Board.CloneAssigned.class, this::boardStalledCloneAssigned)
                 .match(SetCell.class, this::boardStalledBreakStall)
                 .build();
 
         cloning = receiveBuilder()
                 .match(CellState.CloneUnassigned.class, this::boardCloneUnassigned)
-                .match(BoardState.CloneAssigned.class, this::boardCloneAssigned)
+                .match(Board.CloneAssigned.class, this::boardCloneAssigned)
                 .build();
     }
 
@@ -88,45 +85,53 @@ class BoardActor extends AbstractLoggingActor {
         boxes.tell(setCell, getSelf());
     }
 
-    private void allCellsAssigned(BoardState.AllCellsAssigned allCellsAssigned) {
+    private void allCellsAssigned(Board.AllCellsAssigned allCellsAssigned) {
         log().info("All cells assigned");
         become(State.solved);
         getContext().getParent().tell(allCellsAssigned, getSelf());
+
+        ActorRef validate = getContext().actorOf(ValidateBoardActor.props(), "validateBoard");
+        validate.tell(new Validate.Board(), getSelf());
+    }
+
+    @SuppressWarnings("unused")
+    private void boardValid(Validate.Valid valid) {
+        log().debug("Board valid");
     }
 
     private void cellInvalid(CellState.Invalid invalid) {
         log().info("{}", invalid);
         become(State.failed);
-        getContext().getParent().tell(new BoardState.Invalid(invalid), getSelf());
+        getContext().getParent().tell(new Board.Invalid(invalid), getSelf());
     }
 
     @SuppressWarnings("unused")
     private void setCellNotRunning(SetCell setCell) {
     }
 
-    private void allCellsAssignedSolved(BoardState.AllCellsAssigned allCellsAssigned) {
+    private void allCellsAssignedSolved(Board.AllCellsAssigned allCellsAssigned) {
         log().info("Board solved {}, sender {}", allCellsAssigned, getSender());
     }
 
-    private void boardStalled(BoardState.Stalled boardStalled) {
+    private void boardStalled(Board.Stalled boardStalled) {
         log().info("Board stalled {}, sender {}", boardStalled, getSender());
         getContext().getParent().tell(boardStalled, getSelf());
         become(State.stalled);
     }
 
-    private void boardStalledCloneUnassigned(BoardState.CloneUnassigned cloneUnassigned) {
+    private void boardStalledCloneUnassigned(Board.CloneUnassigned cloneUnassigned) {
         log().debug("Clone stalled {}, sender {}", cloneUnassigned, getSender());
         cellsUnassigned.tell(cloneUnassigned, getSelf());
     }
 
-    private void boardStalledCloneAssigned(BoardState.CloneAssigned cloneAssigned) {
+    private void boardStalledCloneAssigned(Board.CloneAssigned cloneAssigned) {
         log().debug("Clone stalled {}, sender {}", cloneAssigned, getSender());
         cellsAssigned.tell(cloneAssigned, getSelf());
     }
 
-    private void boardClone(BoardState.Clone clone) {
+    private void boardClone(Board.Clone clone) {
         log().debug("Clone from stalled board {} to board {}, sender {}", clone.boardStalled, clone.boardClone, getSender());
-        clone.boardStalled.tell(new BoardState.CloneUnassigned(clone.boardStalled, clone.boardClone), getSelf());
+        clone.boardStalled.tell(new Board.CloneUnassigned(clone.boardStalled, clone.boardClone), getSelf());
         become(State.cloning);
     }
 
@@ -146,7 +151,7 @@ class BoardActor extends AbstractLoggingActor {
                     String.format("Stall breaker 2, (%d, %d) = %d", cloneUnassigned.row, cloneUnassigned.col, cloneUnassigned.possibleValues.get(1))
             );
 
-            cloneUnassigned.boardStalled.tell(new BoardState.CloneAssigned(cloneUnassigned.boardClone), getSelf());
+            cloneUnassigned.boardStalled.tell(new Board.CloneAssigned(cloneUnassigned.boardClone), getSelf());
 
             getSelf().tell(setCell1, getSelf());
             cloneUnassigned.boardStalled.tell(setCell2, getSelf());
@@ -164,8 +169,14 @@ class BoardActor extends AbstractLoggingActor {
         setCell(setCell);
     }
 
-    private void boardCloneAssigned(BoardState.CloneAssigned cloneAssigned) {
+    private void boardCloneAssigned(Board.CloneAssigned cloneAssigned) {
         cellsAssigned.forward(cloneAssigned, getContext());
+    }
+
+    private  void validateBoard(Validate.Board validateBoard) {
+        log().debug("{}", validateBoard);
+
+        cellsAssigned.forward(validateBoard, getContext());
     }
 
     private void become(State state) {

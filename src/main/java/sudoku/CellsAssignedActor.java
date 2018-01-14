@@ -4,7 +4,6 @@ import akka.actor.AbstractLoggingActor;
 import akka.actor.ActorRef;
 import akka.actor.Props;
 
-import java.io.Serializable;
 import java.util.Optional;
 
 class CellsAssignedActor extends AbstractLoggingActor {
@@ -12,7 +11,8 @@ class CellsAssignedActor extends AbstractLoggingActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(SetCell.class, this::setCell)
-                .match(BoardState.CloneAssigned.class, this::cloneCells)
+                .match(Board.CloneAssigned.class, this::cloneCells)
+                .match(Validate.Board.class, this::validateBoard)
                 .build();
     }
 
@@ -29,9 +29,13 @@ class CellsAssignedActor extends AbstractLoggingActor {
         }
     }
 
-    private void cloneCells(BoardState.CloneAssigned cloneAssigned) {
+    private void cloneCells(Board.CloneAssigned cloneAssigned) {
         log().debug("{}", cloneAssigned);
         getContext().getChildren().forEach(child -> child.tell(cloneAssigned, getSelf()));
+    }
+
+    private void validateBoard(Validate.Board validateBoard) {
+        getContext().getChildren().forEach(child -> child.forward(validateBoard, getContext()));
     }
 
     static Props props() {

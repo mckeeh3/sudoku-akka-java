@@ -28,7 +28,7 @@ class CellUnassignedActor extends AbstractLoggingActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(SetCell.class, this::setCell)
-                .match(BoardState.CloneUnassigned.class, this::cloneUnassigned)
+                .match(Board.CloneUnassigned.class, this::cloneUnassigned)
                 .build();
     }
 
@@ -104,7 +104,7 @@ class CellUnassignedActor extends AbstractLoggingActor {
         getSender().tell(new CellState.Invalid(row, col), getSelf());
     }
 
-    private void cloneUnassigned(BoardState.CloneUnassigned cloneUnassigned) {
+    private void cloneUnassigned(Board.CloneUnassigned cloneUnassigned) {
         cloneUnassigned.boardClone.tell(new CellState.CloneUnassigned(row, col, possibleValues, cloneUnassigned.boardStalled, cloneUnassigned.boardClone), getSelf());
     }
 
