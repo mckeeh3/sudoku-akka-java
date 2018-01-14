@@ -23,7 +23,7 @@ class ValidateBoardActor extends AbstractLoggingActor {
                 .match(SetCell.class, this::setCell)
                 .match(Validate.Valid.class, this::validRowColBox)
                 .match(Validate.Invalid.class, this::invalidRowColBox)
-                .match(Board.CloneAssigned.class, this::cloneAssignedIgnore)
+                .match(Clone.Board.class, this::cloneBoard)
                 .build();
     }
 
@@ -51,7 +51,7 @@ class ValidateBoardActor extends AbstractLoggingActor {
     }
 
     @SuppressWarnings("unused")
-    private void cloneAssignedIgnore(Board.CloneAssigned cloneAssigned) {
+    private void cloneBoard(Clone.Board cloneBoard) {
     }
 
     static Props props() {

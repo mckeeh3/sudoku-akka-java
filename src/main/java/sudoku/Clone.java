@@ -8,7 +8,11 @@ import java.util.List;
 
 interface Clone {
     class Board implements Serializable {
+        @Override
+        public String toString() {
+            return String.format("%s[]", getClass().getSimpleName());
         }
+    }
 
     class Boards implements Serializable {
         final ActorRef boardFrom;
@@ -24,6 +28,7 @@ interface Clone {
             return String.format("%s[clone from %s, to %s]", getClass().getSimpleName(), boardFrom, boardTo);
         }
     }
+
     class CloneUnassigned implements Serializable {
         final int row;
         final int col;
@@ -59,32 +64,4 @@ interface Clone {
             return String.format("%s[(%d, %d) = %d, %s]", getClass().getSimpleName(), row, col, value, who);
         }
     }
-
-//    class CloneUnassigned implements Serializable {
-//        final ActorRef boardFrom;
-//        final ActorRef boardTo;
-//
-//        CloneUnassigned(ActorRef boardFrom, ActorRef boardTo) {
-//            this.boardFrom = boardFrom;
-//            this.boardTo = boardTo;
-//        }
-//
-//        @Override
-//        public String toString() {
-//            return String.format("%s[from %s, to %s]", getClass().getSimpleName(), boardFrom, boardTo);
-//        }
-//    }
-
-//    class CloneAssigned implements Serializable {
-//        final ActorRef boardTo;
-//
-//        CloneAssigned(ActorRef boardTo) {
-//            this.boardTo = boardTo;
-//        }
-//
-//        @Override
-//        public String toString() {
-//            return String.format("%s[to %s]", getClass().getSimpleName(), boardTo);
-//        }
-//    }
 }

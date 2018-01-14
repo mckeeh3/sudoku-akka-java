@@ -18,7 +18,6 @@ class CellsUnassignedActor extends AbstractLoggingActor {
                 .match(SetCell.class, this::setCell)
                 .match(CellState.NoChange.class, this::noChange)
                 .match(Terminated.class, this::cellStopped)
-                .match(Board.CloneUnassigned.class, this::cloneCells)
                 .match(Clone.Board.class, this::cloneBoard)
                 .build();
 
@@ -31,7 +30,6 @@ class CellsUnassignedActor extends AbstractLoggingActor {
                 .match(SetCell.class, this::setCellStalled)
                 .match(CellState.NoChange.class, this::noChangeStalled)
                 .match(Terminated.class, this::cellStopped)
-                .match(Board.CloneUnassigned.class, this::cloneCells)
                 .match(Clone.Board.class, this::cloneBoard)
                 .build();
     }
@@ -102,11 +100,6 @@ class CellsUnassignedActor extends AbstractLoggingActor {
             getContext().getParent().tell(new Board.Stalled(), getSelf());
             getContext().become(stalled);
         }
-    }
-
-    private void cloneCells(Board.CloneUnassigned cloneUnassigned) {
-        log().debug("{}", cloneUnassigned);
-        getContext().getChildren().forEach(child -> child.tell(cloneUnassigned, getSelf()));
     }
 
     private void cloneBoard(Clone.Board cloneBoard) {

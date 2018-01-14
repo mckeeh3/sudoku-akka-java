@@ -29,10 +29,9 @@ class SudokuActor extends AbstractLoggingActor {
     private void boardStalled(Board.Stalled stalled) {
         log().info("Board stalled, sender {}", getSender());
         ActorRef board = getContext().actorOf(BoardActor.props(), String.format("board-%d", ++boardNumber));
-//        board.tell(new Board.Clone(getSender(), board), getSelf());
 
         Clone.Boards boards = new Clone.Boards(getSender(), board);
-        ActorRef cloneBoards = getContext().actorOf(CloneBoardActor.props(boardNumber));
+        ActorRef cloneBoards = getContext().actorOf(CloneBoardActor.props(boardNumber), String.format("cloneBoard-%d", boardNumber));
         cloneBoards.tell(boards, getSelf());
     }
 

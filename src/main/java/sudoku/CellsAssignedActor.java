@@ -17,7 +17,6 @@ class CellsAssignedActor extends AbstractLoggingActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(SetCell.class, this::setCell)
-                .match(Board.CloneAssigned.class, this::cloneCells)
                 .match(Validate.Valid.class, this::validBoard)
                 .match(Validate.Invalid.class, this::invalidBoard)
                 .match(Clone.Board.class, this::cloneBoard)
@@ -36,11 +35,6 @@ class CellsAssignedActor extends AbstractLoggingActor {
             getContext().actorOf(CellAssignedActor.props(setCell.row, setCell.col, setCell.value, setCell.who), name);
             validateBoard.tell(setCell, getSelf());
         }
-    }
-
-    private void cloneCells(Board.CloneAssigned cloneAssigned) {
-        log().debug("{}", cloneAssigned);
-        getContext().getChildren().forEach(child -> child.tell(cloneAssigned, getSelf()));
     }
 
     private void cloneBoard(Clone.Board cloneBoard) {

@@ -19,7 +19,6 @@ class CellAssignedActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(Board.CloneAssigned.class, this::cloneAssigned)
                 .match(Clone.Board.class, this::cloneBoard)
                 .build();
     }
@@ -27,10 +26,6 @@ class CellAssignedActor extends AbstractLoggingActor {
     @SuppressWarnings("unused")
     private void cloneBoard(Clone.Board cloneBoard) {
         getSender().tell(new Clone.CloneAssigned(row, col, value, who), getSelf());
-    }
-
-    private void cloneAssigned(Board.CloneAssigned cloneAssigned) {
-        cloneAssigned.boardClone.tell(new SetCell(row, col, value, who), getSelf());
     }
 
     static Props props(int row, int col, int value, String who) {
