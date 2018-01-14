@@ -35,7 +35,7 @@ class ValidateRowsActor extends AbstractLoggingActor {
     }
 
     private void invalidRow(Validate.Invalid invalid) {
-        log().debug("{}", invalid);
+        getContext().getParent().tell(invalid, getSelf());
     }
 
     static Props props() {

@@ -35,7 +35,7 @@ class ValidateColumnsActor extends AbstractLoggingActor {
     }
 
     private void invalidColumn(Validate.Invalid invalid) {
-        log().debug("{}", invalid);
+        getContext().getParent().tell(invalid, getSelf());
     }
 
     static Props props() {

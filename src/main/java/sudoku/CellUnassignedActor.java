@@ -4,6 +4,7 @@ import akka.actor.AbstractLoggingActor;
 import akka.actor.Props;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 class CellUnassignedActor extends AbstractLoggingActor {
@@ -18,10 +19,7 @@ class CellUnassignedActor extends AbstractLoggingActor {
         boxIndex = boxFor(row, col);
 
         possibleValues = new ArrayList<>();
-
-        for (int value = 1; value < 10; value++) {
-            possibleValues.add(value);
-        }
+        Collections.addAll(possibleValues, 1, 2, 3, 4, 5, 6, 7, 8, 9);
     }
 
     @Override
@@ -29,6 +27,7 @@ class CellUnassignedActor extends AbstractLoggingActor {
         return receiveBuilder()
                 .match(SetCell.class, this::setCell)
                 .match(Board.CloneUnassigned.class, this::cloneUnassigned)
+                .match(Clone.Board.class, this::cloneBoard)
                 .build();
     }
 
@@ -106,6 +105,11 @@ class CellUnassignedActor extends AbstractLoggingActor {
 
     private void cloneUnassigned(Board.CloneUnassigned cloneUnassigned) {
         cloneUnassigned.boardClone.tell(new CellState.CloneUnassigned(row, col, possibleValues, cloneUnassigned.boardStalled, cloneUnassigned.boardClone), getSelf());
+    }
+
+    @SuppressWarnings("unused")
+    private void cloneBoard(Clone.Board cloneBoard) {
+        getSender().tell(new Clone.CloneUnassigned(row, col, possibleValues), getSelf());
     }
 
     static Props props(int row, int col) {

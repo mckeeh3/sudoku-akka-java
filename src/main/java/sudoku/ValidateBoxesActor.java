@@ -34,7 +34,7 @@ class ValidateBoxesActor extends AbstractLoggingActor {
     }
 
     private void invalidBox(Validate.Invalid invalid) {
-        log().debug("{}", invalid);
+        getContext().getParent().tell(invalid, getSelf());
     }
 
     static Props props() {

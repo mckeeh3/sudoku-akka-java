@@ -20,16 +20,15 @@ class ValidateBoardActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(Validate.Board.class, this::validateBoard)
-                .match(Cell.class, this::validateCell)
+                .match(SetCell.class, this::setCell)
                 .match(Validate.Valid.class, this::validRowColBox)
+                .match(Validate.Invalid.class, this::invalidRowColBox)
+                .match(Board.CloneAssigned.class, this::cloneAssignedIgnore)
                 .build();
     }
 
-    private void validateBoard(Validate.Board validateBoard) {
-        log().debug("{}", validateBoard);
-
-        getSender().tell(validateBoard, getSelf());
+    private void setCell(SetCell setCell) {
+        validateCell(new Cell(setCell.row, setCell.col, setCell.value));
     }
 
     private void validateCell(Cell cell) {
@@ -42,8 +41,17 @@ class ValidateBoardActor extends AbstractLoggingActor {
     private void validRowColBox(Validate.Valid valid) {
         validRowColBox++;
         if (validRowColBox == 3) {
-            getContext().getParent().tell(valid, getSelf());
+            getContext().getParent().tell(new Validate.Valid("Board solved"), getSelf());
         }
+    }
+
+    private void invalidRowColBox(Validate.Invalid invalid) {
+        log().debug("{}", invalid);
+        getContext().getParent().tell(invalid, getSelf());
+    }
+
+    @SuppressWarnings("unused")
+    private void cloneAssignedIgnore(Board.CloneAssigned cloneAssigned) {
     }
 
     static Props props() {

@@ -18,9 +18,12 @@ class CellsUnassignedActor extends AbstractLoggingActor {
                 .match(SetCell.class, this::setCell)
                 .match(CellState.NoChange.class, this::noChange)
                 .match(Terminated.class, this::cellStopped)
+                .match(Board.CloneUnassigned.class, this::cloneCells)
+                .match(Clone.Board.class, this::cloneBoard)
                 .build();
 
         solved = receiveBuilder()
+                .match(SetCell.class, this::setCellSolved)
                 .match(CellState.NoChange.class, this::noChangeSolved)
                 .build();
 
@@ -29,6 +32,7 @@ class CellsUnassignedActor extends AbstractLoggingActor {
                 .match(CellState.NoChange.class, this::noChangeStalled)
                 .match(Terminated.class, this::cellStopped)
                 .match(Board.CloneUnassigned.class, this::cloneCells)
+                .match(Clone.Board.class, this::cloneBoard)
                 .build();
     }
 
@@ -65,6 +69,10 @@ class CellsUnassignedActor extends AbstractLoggingActor {
         setCell(setCell);
     }
 
+    @SuppressWarnings("unused")
+    private void setCellSolved(SetCell setCell) {
+    }
+
     private void noChange(CellState.NoChange noChange) {
         if (lastSetCell.equals(noChange.setCell)) {
             cellCountNoChange++;
@@ -99,6 +107,10 @@ class CellsUnassignedActor extends AbstractLoggingActor {
     private void cloneCells(Board.CloneUnassigned cloneUnassigned) {
         log().debug("{}", cloneUnassigned);
         getContext().getChildren().forEach(child -> child.tell(cloneUnassigned, getSelf()));
+    }
+
+    private void cloneBoard(Clone.Board cloneBoard) {
+        getContext().getChildren().forEach(child -> child.forward(cloneBoard, getContext()));
     }
 
     static Props props() {

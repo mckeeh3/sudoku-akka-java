@@ -20,18 +20,17 @@ class CellAssignedActor extends AbstractLoggingActor {
     public Receive createReceive() {
         return receiveBuilder()
                 .match(Board.CloneAssigned.class, this::cloneAssigned)
-                .match(Validate.Board.class, this::validateBoard)
+                .match(Clone.Board.class, this::cloneBoard)
                 .build();
     }
 
-    private void cloneAssigned(Board.CloneAssigned cloneAssigned) {
-//        log().debug("{}", cloneAssigned);
-        cloneAssigned.boardClone.tell(new SetCell(row, col, value, who), getSelf());
+    @SuppressWarnings("unused")
+    private void cloneBoard(Clone.Board cloneBoard) {
+        getSender().tell(new Clone.CloneAssigned(row, col, value, who), getSelf());
     }
 
-    @SuppressWarnings("unused")
-    private void validateBoard(Validate.Board validateBoard) {
-        getSender().tell(new Cell(row, col, value), getSelf());
+    private void cloneAssigned(Board.CloneAssigned cloneAssigned) {
+        cloneAssigned.boardClone.tell(new SetCell(row, col, value, who), getSelf());
     }
 
     static Props props(int row, int col, int value, String who) {

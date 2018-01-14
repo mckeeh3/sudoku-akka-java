@@ -7,12 +7,20 @@ import akka.actor.Props;
 import java.util.Optional;
 
 class CellsAssignedActor extends AbstractLoggingActor {
+    private final ActorRef validateBoard;
+
+    {
+        validateBoard = getContext().actorOf(ValidateBoardActor.props(), "validate-board");
+    }
+
     @Override
     public Receive createReceive() {
         return receiveBuilder()
                 .match(SetCell.class, this::setCell)
                 .match(Board.CloneAssigned.class, this::cloneCells)
-                .match(Validate.Board.class, this::validateBoard)
+                .match(Validate.Valid.class, this::validBoard)
+                .match(Validate.Invalid.class, this::invalidBoard)
+                .match(Clone.Board.class, this::cloneBoard)
                 .build();
     }
 
@@ -26,6 +34,7 @@ class CellsAssignedActor extends AbstractLoggingActor {
             log().debug("Assign {}", setCell);
             String name = cellName(setCell);
             getContext().actorOf(CellAssignedActor.props(setCell.row, setCell.col, setCell.value, setCell.who), name);
+            validateBoard.tell(setCell, getSelf());
         }
     }
 
@@ -34,8 +43,16 @@ class CellsAssignedActor extends AbstractLoggingActor {
         getContext().getChildren().forEach(child -> child.tell(cloneAssigned, getSelf()));
     }
 
-    private void validateBoard(Validate.Board validateBoard) {
-        getContext().getChildren().forEach(child -> child.forward(validateBoard, getContext()));
+    private void cloneBoard(Clone.Board cloneBoard) {
+        getContext().getChildren().forEach(child -> child.forward(cloneBoard, getContext()));
+    }
+
+    private void validBoard(Validate.Valid valid) {
+        getContext().getParent().tell(valid, getSelf());
+    }
+
+    private void invalidBoard(Validate.Invalid invalid) {
+        getContext().getParent().tell(invalid, getSelf());
     }
 
     static Props props() {
