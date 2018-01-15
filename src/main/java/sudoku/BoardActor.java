@@ -28,30 +28,29 @@ class BoardActor extends AbstractLoggingActor {
         boxes = getContext().actorOf(BoxesActor.props(), "boxes");
 
         running = receiveBuilder()
-                .match(SetCell.class, this::setCell)
+                .match(Cell.SetCell.class, this::setCell)
                 .match(Board.AllCellsAssigned.class, this::allCellsAssigned)
-                .match(CellState.Invalid.class, this::cellInvalid)
+                .match(Cell.Invalid.class, this::cellInvalid)
                 .match(Validate.Invalid.class, this::boardInvalid)
                 .match(Validate.Valid.class, this::boardValid)
                 .match(Board.Stalled.class, this::boardStalled)
-//                .match(CellState.CloneUnassigned.class, this::cloneUnassignedIgnore)
                 .match(Clone.Board.class, this::cloneBoard)
                 .build();
 
         solved = receiveBuilder()
-                .match(SetCell.class, this::setCellNotRunning)
+                .match(Cell.SetCell.class, this::setCellNotRunning)
                 .match(Board.AllCellsAssigned.class, this::allCellsAssignedSolved)
                 .match(Validate.Invalid.class, this::boardInvalid)
                 .match(Validate.Valid.class, this::boardValid)
                 .build();
 
         failed = receiveBuilder()
-                .match(SetCell.class, this::setCellNotRunning)
+                .match(Cell.SetCell.class, this::setCellNotRunning)
                 .match(Validate.Invalid.class, this::boardInvalidAlreadyFailed)
                 .build();
 
         stalled = receiveBuilder()
-                .match(SetCell.class, this::boardStalledBreakStall)
+                .match(Cell.SetCell.class, this::boardStalledBreakStall)
                 .match(Clone.Board.class, this::cloneBoard)
                 .build();
     }
@@ -61,7 +60,7 @@ class BoardActor extends AbstractLoggingActor {
         return running;
     }
 
-    private void setCell(SetCell setCell) {
+    private void setCell(Cell.SetCell setCell) {
         log().debug("{}", setCell);
 
         cellsAssigned.tell(setCell, getSelf());
@@ -94,14 +93,14 @@ class BoardActor extends AbstractLoggingActor {
     private void boardInvalidAlreadyFailed(Validate.Invalid invalid) {
     }
 
-    private void cellInvalid(CellState.Invalid invalid) {
+    private void cellInvalid(Cell.Invalid invalid) {
         log().info("{}", invalid);
         become(State.failed);
         getContext().getParent().tell(new Board.Invalid(invalid), getSelf());
     }
 
     @SuppressWarnings("unused")
-    private void setCellNotRunning(SetCell setCell) {
+    private void setCellNotRunning(Cell.SetCell setCell) {
     }
 
     private void allCellsAssignedSolved(Board.AllCellsAssigned allCellsAssigned) {
@@ -119,7 +118,7 @@ class BoardActor extends AbstractLoggingActor {
         cellsAssigned.forward(cloneBoard, getContext());
     }
 
-    private void boardStalledBreakStall(SetCell setCell) {
+    private void boardStalledBreakStall(Cell.SetCell setCell) {
         become(State.running);
         setCell(setCell);
     }

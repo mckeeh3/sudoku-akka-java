@@ -7,7 +7,7 @@ class BoxesActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(SetCell.class, this::setCell)
+                .match(Cell.SetCell.class, this::setCell)
                 .build();
     }
 
@@ -23,7 +23,7 @@ class BoxesActor extends AbstractLoggingActor {
         }
     }
 
-    private void setCell(SetCell setCell) {
+    private void setCell(Cell.SetCell setCell) {
         getContext().getChildren().forEach(box -> box.forward(setCell, getContext()));
     }
 

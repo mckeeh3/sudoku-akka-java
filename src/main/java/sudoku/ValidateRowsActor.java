@@ -9,7 +9,7 @@ class ValidateRowsActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(Cell.class, this::validateCell)
+                .match(Cell.Basic.class, this::validateCell)
                 .match(Validate.Valid.class, this::validRow)
                 .match(Validate.Invalid.class, this::invalidRow)
                 .build();
@@ -22,7 +22,7 @@ class ValidateRowsActor extends AbstractLoggingActor {
         }
     }
 
-    private void validateCell(Cell cell) {
+    private void validateCell(Cell.Basic cell) {
         getContext().getChildren().forEach(row -> row.tell(cell, getSelf()));
     }
 

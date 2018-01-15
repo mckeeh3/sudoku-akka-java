@@ -7,7 +7,7 @@ class RowsActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(SetCell.class, this::setCell)
+                .match(Cell.SetCell.class, this::setCell)
                 .build();
     }
 
@@ -21,7 +21,7 @@ class RowsActor extends AbstractLoggingActor {
         }
     }
 
-    private void setCell(SetCell setCell) {
+    private void setCell(Cell.SetCell setCell) {
         getContext().getChildren().forEach(row -> row.forward(setCell, getContext()));
     }
 

@@ -38,7 +38,7 @@ class CloneBoardActor extends AbstractLoggingActor {
     }
 
     private void cloneAssigned(Clone.CloneAssigned cloneAssigned) {
-        SetCell setCell = new SetCell(
+        Cell.SetCell setCell = new Cell.SetCell(
                 cloneAssigned.row,
                 cloneAssigned.col,
                 cloneAssigned.value,
@@ -50,14 +50,14 @@ class CloneBoardActor extends AbstractLoggingActor {
 
     private void cloneUnassignedBeforeSplit(Clone.CloneUnassigned cloneUnassigned) {
         if (cloneUnassigned.possibleValues.size() == 2) {
-            SetCell setCell1 = new SetCell(
+            Cell.SetCell setCell1 = new Cell.SetCell(
                     cloneUnassigned.row,
                     cloneUnassigned.col,
                     cloneUnassigned.possibleValues.get(0),
                     String.format("Stall breaker 1, (%d, %d) = %d", cloneUnassigned.row, cloneUnassigned.col, cloneUnassigned.possibleValues.get(0))
             );
 
-            SetCell setCell2 = new SetCell(
+            Cell.SetCell setCell2 = new Cell.SetCell(
                     cloneUnassigned.row,
                     cloneUnassigned.col,
                     cloneUnassigned.possibleValues.get(1),

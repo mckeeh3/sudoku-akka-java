@@ -25,12 +25,12 @@ class CellUnassignedActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(SetCell.class, this::setCell)
+                .match(Cell.SetCell.class, this::setCell)
                 .match(Clone.Board.class, this::cloneBoard)
                 .build();
     }
 
-    private void setCell(SetCell setCell) {
+    private void setCell(Cell.SetCell setCell) {
 //        List<Integer> pv = new ArrayList<>(possibleValues);
 //        log().debug("{} {}", setCell, possibleValues);
 
@@ -48,23 +48,23 @@ class CellUnassignedActor extends AbstractLoggingActor {
 //        }
     }
 
-    private boolean isSameCell(SetCell setCell) {
+    private boolean isSameCell(Cell.SetCell setCell) {
         return setCell.row == this.row && setCell.col == this.col;
     }
 
-    private boolean isSameRowColOrBox(SetCell setCell) {
+    private boolean isSameRowColOrBox(Cell.SetCell setCell) {
         return isSameRow(setCell) || isSameCol(setCell) || isSameBox(setCell);
     }
 
-    private boolean isSameRow(SetCell setCell) {
+    private boolean isSameRow(Cell.SetCell setCell) {
         return setCell.row == this.row;
     }
 
-    private boolean isSameCol(SetCell setCell) {
+    private boolean isSameCol(Cell.SetCell setCell) {
         return setCell.col == this.col;
     }
 
-    private boolean isSameBox(SetCell setCell) {
+    private boolean isSameBox(Cell.SetCell setCell) {
         return boxIndex == boxFor(setCell.row, setCell.col);
     }
 
@@ -74,17 +74,17 @@ class CellUnassignedActor extends AbstractLoggingActor {
         return (boxRow - 1) * 3 + boxCol;
     }
 
-    private void trimPossibleValues(SetCell setCell) {
+    private void trimPossibleValues(Cell.SetCell setCell) {
         possibleValues.removeIf(value -> value == setCell.value);
     }
 
-    private void checkPossibleValues(SetCell setCell) {
+    private void checkPossibleValues(Cell.SetCell setCell) {
         if (possibleValues.size() == 1) {
             cellSetByThisCell();
         } else if (possibleValues.isEmpty()) {
             cellIsInvalid();
         } else {
-            getContext().getParent().tell(new CellState.NoChange(setCell), getSelf());
+            getContext().getParent().tell(new Cell.NoChange(setCell), getSelf());
         }
     }
 
@@ -94,12 +94,12 @@ class CellUnassignedActor extends AbstractLoggingActor {
 
     private void cellSetByThisCell() {
         String who = String.format("Set by cell (%d, %d) = %d", row, col, possibleValues.get(0));
-        getSender().tell(new SetCell(row, col, possibleValues.get(0), who), getSelf());
+        getSender().tell(new Cell.SetCell(row, col, possibleValues.get(0), who), getSelf());
         getContext().stop(getSelf());
     }
 
     private void cellIsInvalid() {
-        getSender().tell(new CellState.Invalid(row, col), getSelf());
+        getSender().tell(new Cell.Invalid(row, col), getSelf());
     }
 
     @SuppressWarnings("unused")

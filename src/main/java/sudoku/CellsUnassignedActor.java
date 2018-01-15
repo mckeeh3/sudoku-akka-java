@@ -7,7 +7,7 @@ import akka.actor.Terminated;
 class CellsUnassignedActor extends AbstractLoggingActor {
     private int cellCount = 0;
     private int cellCountNoChange;
-    private SetCell lastSetCell;
+    private Cell.SetCell lastSetCell;
 
     private Receive running;
     private Receive solved;
@@ -15,20 +15,20 @@ class CellsUnassignedActor extends AbstractLoggingActor {
 
     {
         running = receiveBuilder()
-                .match(SetCell.class, this::setCell)
-                .match(CellState.NoChange.class, this::noChange)
+                .match(Cell.SetCell.class, this::setCell)
+                .match(Cell.NoChange.class, this::noChange)
                 .match(Terminated.class, this::cellStopped)
                 .match(Clone.Board.class, this::cloneBoard)
                 .build();
 
         solved = receiveBuilder()
-                .match(SetCell.class, this::setCellSolved)
-                .match(CellState.NoChange.class, this::noChangeSolved)
+                .match(Cell.SetCell.class, this::setCellSolved)
+                .match(Cell.NoChange.class, this::noChangeSolved)
                 .build();
 
         stalled = receiveBuilder()
-                .match(SetCell.class, this::setCellStalled)
-                .match(CellState.NoChange.class, this::noChangeStalled)
+                .match(Cell.SetCell.class, this::setCellStalled)
+                .match(Cell.NoChange.class, this::noChangeStalled)
                 .match(Terminated.class, this::cellStopped)
                 .match(Clone.Board.class, this::cloneBoard)
                 .build();
@@ -50,7 +50,7 @@ class CellsUnassignedActor extends AbstractLoggingActor {
         }
     }
 
-    private void setCell(SetCell setCell) {
+    private void setCell(Cell.SetCell setCell) {
         if (getContext().getChildren().iterator().hasNext()) {
             getContext().getChildren().forEach(child -> child.forward(setCell, getContext()));
         } else {
@@ -62,16 +62,16 @@ class CellsUnassignedActor extends AbstractLoggingActor {
         cellCountNoChange = 0;
     }
 
-    private void setCellStalled(SetCell setCell) {
+    private void setCellStalled(Cell.SetCell setCell) {
         getContext().become(running);
         setCell(setCell);
     }
 
     @SuppressWarnings("unused")
-    private void setCellSolved(SetCell setCell) {
+    private void setCellSolved(Cell.SetCell setCell) {
     }
 
-    private void noChange(CellState.NoChange noChange) {
+    private void noChange(Cell.NoChange noChange) {
         if (lastSetCell.equals(noChange.setCell)) {
             cellCountNoChange++;
             checkIfStalled();
@@ -79,11 +79,11 @@ class CellsUnassignedActor extends AbstractLoggingActor {
     }
 
     @SuppressWarnings("unused")
-    private void noChangeSolved(CellState.NoChange noChange) {
+    private void noChangeSolved(Cell.NoChange noChange) {
     }
 
     @SuppressWarnings("unused")
-    private void noChangeStalled(CellState.NoChange noChange) {
+    private void noChangeStalled(Cell.NoChange noChange) {
     }
 
     @SuppressWarnings("unused")
@@ -95,7 +95,7 @@ class CellsUnassignedActor extends AbstractLoggingActor {
 
     private void checkIfStalled() {
         if (cellCountNoChange >= cellCount) {
-            log().debug("Cells stalled, cell unsolved {} stalled {}", cellCount, cellCountNoChange);
+            log().debug("Cell stalled, cell unsolved {} stalled {}", cellCount, cellCountNoChange);
 
             getContext().getParent().tell(new Board.Stalled(), getSelf());
             getContext().become(stalled);

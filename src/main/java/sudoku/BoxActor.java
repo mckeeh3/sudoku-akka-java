@@ -10,7 +10,7 @@ class BoxActor extends AbstractLoggingActor {
     private final int row;
     private final int col;
     private final int monitoredValue;
-    private List<Cell> monitoredCells = new ArrayList<>();
+    private List<Cell.Basic> monitoredCells = new ArrayList<>();
     private final int boxIndex;
 
     private BoxActor(int row, int col, int monitoredValue) {
@@ -24,7 +24,7 @@ class BoxActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(SetCell.class, this::setCell)
+                .match(Cell.SetCell.class, this::setCell)
                 .build();
     }
 
@@ -33,13 +33,13 @@ class BoxActor extends AbstractLoggingActor {
         for (int r = 1; r <= 9; r++) {
             for (int c = 1; c <= 9; c++) {
                 if (boxIndex == boxFor(r, c)) {
-                    monitoredCells.add(new Cell(r, c, monitoredValue));
+                    monitoredCells.add(new Cell.Basic(r, c, monitoredValue));
                 }
             }
         }
     }
 
-    private void setCell(SetCell setCell) {
+    private void setCell(Cell.SetCell setCell) {
 //        List<Cell> mc = new ArrayList<>(monitoredCells);
 
         removeCellFromBoxSameValue(setCell);
@@ -50,9 +50,9 @@ class BoxActor extends AbstractLoggingActor {
         if (monitoredCells.isEmpty()) {
             monitoringComplete();
         } else if (monitoredCells.size() == 1) {
-            Cell cell = monitoredCells.get(0);
+            Cell.Basic cell = monitoredCells.get(0);
             String who = String.format("Set by box (%d, %d) = %d", row, col, monitoredValue);
-            getSender().tell(new SetCell(cell.row, cell.col, monitoredValue, who), getSelf());
+            getSender().tell(new Cell.SetCell(cell.row, cell.col, monitoredValue, who), getSelf());
             monitoringComplete();
         }
 
@@ -68,15 +68,15 @@ class BoxActor extends AbstractLoggingActor {
         return (boxRow - 1) * 3 + boxCol;
     }
 
-    private boolean isInBox(SetCell setCell) {
+    private boolean isInBox(Cell.SetCell setCell) {
         return boxIndex == boxFor(setCell.row, setCell.col);
     }
 
-    private boolean isSameCell(SetCell setCell, Cell cell) {
+    private boolean isSameCell(Cell.SetCell setCell, Cell.Basic cell) {
         return cell.row == setCell.row && cell.col == setCell.col;
     }
 
-    private boolean isMonitoredValue(SetCell setCell) {
+    private boolean isMonitoredValue(Cell.SetCell setCell) {
         return monitoredValue == setCell.value;
     }
 
@@ -84,23 +84,23 @@ class BoxActor extends AbstractLoggingActor {
         getContext().stop(getSelf());
     }
 
-    private void removeCellFromBoxSameValue(SetCell setCell) {
+    private void removeCellFromBoxSameValue(Cell.SetCell setCell) {
         if (isInBox(setCell) && isMonitoredValue(setCell)) {
             monitoredCells = new ArrayList<>();
         }
     }
 
-    private void removeCellFromBoxAnyValue(SetCell setCell) {
+    private void removeCellFromBoxAnyValue(Cell.SetCell setCell) {
         monitoredCells.removeIf(cell -> isSameCell(setCell, cell));
     }
 
-    private void removeCellFromRow(SetCell setCell) {
+    private void removeCellFromRow(Cell.SetCell setCell) {
         if (isMonitoredValue(setCell)) {
             monitoredCells.removeIf(cell -> cell.row == setCell.row);
         }
     }
 
-    private void removeCellFromCol(SetCell setCell) {
+    private void removeCellFromCol(Cell.SetCell setCell) {
         if (isMonitoredValue(setCell)) {
             monitoredCells.removeIf(cell -> cell.col == setCell.col);
         }

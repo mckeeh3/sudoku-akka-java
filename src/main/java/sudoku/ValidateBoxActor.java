@@ -21,11 +21,11 @@ class ValidateBoxActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(Cell.class, this::validateCell)
+                .match(Cell.Basic.class, this::validateCell)
                 .build();
     }
 
-    private void validateCell(Cell cell) {
+    private void validateCell(Cell.Basic cell) {
         if (isInBox(cell)) {
             if (!values.removeIf(value -> value == cell.value)) {
                 getSender().tell(new Validate.Invalid(String.format("Invalid box %d, %s", box, cell)), getSelf());
@@ -37,11 +37,11 @@ class ValidateBoxActor extends AbstractLoggingActor {
         }
     }
 
-    private boolean isInBox(Cell cell) {
+    private boolean isInBox(Cell.Basic cell) {
         return box == boxFor(cell);
     }
 
-    private int boxFor(Cell cell) {
+    private int boxFor(Cell.Basic cell) {
         int boxRow = (cell.row - 1) / 3 + 1;
         int boxCol = (cell.col - 1) / 3 + 1;
         return (boxRow - 1) * 3 + boxCol;

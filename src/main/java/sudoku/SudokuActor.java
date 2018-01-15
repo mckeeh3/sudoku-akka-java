@@ -52,7 +52,7 @@ class SudokuActor extends AbstractLoggingActor {
                 int value = grid.cell(row, col).value;
                 if (value > 0) {
                     String who = String.format("Initialize cell (%d, %d) = %d", row, col, value);
-                    SetCell setCell = new SetCell(row, col, value, who);
+                    Cell.SetCell setCell = new Cell.SetCell(row, col, value, who);
                     board.tell(setCell, getSelf());
                 }
             }

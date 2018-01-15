@@ -86,7 +86,7 @@ public class Sudoku {
                         " ,9,8, , ,5, , , ," +
                         " , , ,1, , ,2, , ";
 
-        String gridValues = valuesEasy01;
+        String gridValues = valuesHard01;
         Grid grid = new Grid(args.length == 0 ? gridValues : args[0]);
 
         ActorSystem actorSystem = ActorSystem.create("Sudoku");

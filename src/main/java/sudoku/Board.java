@@ -18,9 +18,9 @@ interface Board {
     }
 
     class Invalid implements Serializable {
-        final CellState.Invalid invalid;
+        final Cell.Invalid invalid;
 
-        Invalid(CellState.Invalid invalid) {
+        Invalid(Cell.Invalid invalid) {
             this.invalid = invalid;
         }
     }

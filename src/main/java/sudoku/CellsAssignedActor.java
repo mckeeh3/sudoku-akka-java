@@ -16,14 +16,14 @@ class CellsAssignedActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(SetCell.class, this::setCell)
+                .match(Cell.SetCell.class, this::setCell)
                 .match(Validate.Valid.class, this::validBoard)
                 .match(Validate.Invalid.class, this::invalidBoard)
                 .match(Clone.Board.class, this::cloneBoard)
                 .build();
     }
 
-    private void setCell(SetCell setCell) {
+    private void setCell(Cell.SetCell setCell) {
         Optional<ActorRef> cellAssigned = getContext().findChild(cellName(setCell));
 
 //        if (cellAssigned.isPresent()) {
@@ -53,7 +53,7 @@ class CellsAssignedActor extends AbstractLoggingActor {
         return Props.create(CellsAssignedActor.class);
     }
 
-    private String cellName(SetCell setCell) {
+    private String cellName(Cell.SetCell setCell) {
         return String.format("assigned-row-%d-col-%d", setCell.row, setCell.col);
     }
 }
