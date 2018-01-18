@@ -11,9 +11,15 @@ interface Board {
     }
 
     class Solved implements Serializable {
+        final Grid grid;
+
+        Solved(Grid grid) {
+            this.grid = grid;
+        }
+
         @Override
         public String toString() {
-            return String.format("%s[]", getClass().getSimpleName());
+            return String.format("%s[%s]", getClass().getSimpleName(), grid);
         }
     }
 
@@ -26,6 +32,13 @@ interface Board {
     }
 
     class AllCellsAssigned implements Serializable {
+        @Override
+        public String toString() {
+            return String.format("%s[]", getClass().getSimpleName());
+        }
+    }
+
+    class Stop implements Serializable {
         @Override
         public String toString() {
             return String.format("%s[]", getClass().getSimpleName());

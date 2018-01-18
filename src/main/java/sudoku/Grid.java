@@ -33,19 +33,42 @@ class Grid implements Serializable {
 
         @Override
         public String toString() {
-            return String.format("%s(%d, %d, %d)", getClass().getSimpleName(), row, col, value);
+            return String.format("%s[(%d, %d) = %d]", getClass().getSimpleName(), row, col, value);
         }
     }
 
     static class Cells {
-        final ArrayList<Cell> cells;
+        private final ArrayList<Cell> cells;
 
         Cells() {
             cells = new ArrayList<>();
         }
+
+        void add(Cell cell) {
+            cells.add(cell);
+        }
+
+        Cell get(int row, int col) {
+            return cells.get((row - 1) * 9 + col - 1);
+        }
+
+        void set(int row, int col, int value) {
+            Cell cell = get(row, col);
+            cells.replaceAll(c -> cell.equals(c) ? new Cell(row, col, value) : c);
+        }
     }
 
     private Cells cells;
+
+    Grid() {
+        cells = new Cells();
+
+        for (int row = 1; row <= 9; row++) {
+            for (int col = 1; col <= 9; col++) {
+                cells.add(new Cell(row, col, 0));
+            }
+        }
+    }
 
     Grid(String values) {
         if (values == null || values.trim().isEmpty()) {
@@ -54,20 +77,24 @@ class Grid implements Serializable {
 
         String[] cellValues = values.split(",");
         if (cellValues.length < 9 * 9) {
-            throw new IllegalArgumentException(String.format("Must provide %s comma delimited grid cell values", 9 * 9));
+            throw new IllegalArgumentException(String.format("Must provide %s comma delimited grid get values", 9 * 9));
         }
 
         cells = new Cells();
 
         for (int row = 1; row <= 9; row++) {
             for (int col = 1; col <= 9; col++) {
-                cells.cells.add(new Cell(row, col, cellValue(row, col, cellValues)));
+                cells.add(new Cell(row, col, cellValue(row, col, cellValues)));
             }
         }
     }
 
-    Cell cell(int row, int col) {
-        return cells.cells.get((row - 1) * 9 + col - 1);
+    void set(int row, int col, int value) {
+        cells.set(row, col, value);
+    }
+
+    Cell get(int row, int col) {
+        return cells.get(row, col);
     }
 
     private int cellValue(int row, int col, String[] cellValues) {
@@ -84,7 +111,7 @@ class Grid implements Serializable {
         for (int row = 1; row <= 9; row++) {
             grid.append("-------------------------------------\n");
             for (int col = 1; col <= 9; col++) {
-                int value = cell(row, col).value;
+                int value = get(row, col).value;
                 grid.append(delimiter).append(value == 0 ? " " : value);
                 delimiter = " | ";
             }

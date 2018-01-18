@@ -21,11 +21,11 @@ class ValidateColumnActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(Cell.Basic.class, this::validateCell)
+                .match(Cell.Detail.class, this::validateCell)
                 .build();
     }
 
-    private void validateCell(Cell.Basic cell) {
+    private void validateCell(Cell.Detail cell) {
         if (isInCol(cell)) {
             if (!values.removeIf(x -> x == cell.value)) {
                 getSender().tell(new Validate.Invalid(String.format("Invalid col %d, %s", col, cell)), getSelf());
@@ -37,7 +37,7 @@ class ValidateColumnActor extends AbstractLoggingActor {
         }
     }
 
-    private boolean isInCol(Cell.Basic cell) {
+    private boolean isInCol(Cell.Detail cell) {
         return col == cell.col;
     }
 

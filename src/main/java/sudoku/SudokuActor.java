@@ -6,23 +6,35 @@ import akka.actor.Props;
 
 class SudokuActor extends AbstractLoggingActor {
     private int boardNumber = 0;
-
-    private SudokuActor(Grid grid) {
-        initializeBoardFromGrid(grid);
-    }
+    private final long timeStart = System.currentTimeMillis();
+    private ActorRef runner;
 
     @Override
     public Receive createReceive() {
         return receiveBuilder()
+                .match(Grid.class, this::solveBoard)
                 .match(Board.Solved.class, this::boardSolved)
-                .match(Board.Stalled.class, this::boardStalled)
                 .match(Board.Invalid.class, this::boardInvalid)
-                .match(Board.AllCellsAssigned.class, this::allCellsAssigned)
+                .match(Board.Stalled.class, this::boardStalled)
                 .build();
     }
 
+    private void solveBoard(Grid grid) {
+        log().info("Solve board {}", grid);
+        runner = getSender();
+        initializeBoardFromGrid(grid);
+    }
+
     private void boardSolved(Board.Solved solved) {
-        log().info("{}", solved);
+        log().info("Board solved {} ms", System.currentTimeMillis() - timeStart);
+        runner.tell(solved, getSelf());
+
+        getContext().getChildren().forEach(child -> child.tell(new Board.Stop(), getSelf()));
+    }
+
+    private void boardInvalid(Board.Invalid invalid) {
+        log().info("Board invalid {}", System.currentTimeMillis() - timeStart);
+        runner.tell(invalid, getSelf());
     }
 
     @SuppressWarnings("unused")
@@ -35,21 +47,12 @@ class SudokuActor extends AbstractLoggingActor {
         cloneBoards.tell(boards, getSelf());
     }
 
-    private void boardInvalid(Board.Invalid invalid) {
-        log().info("{}", invalid);
-    }
-
-    @SuppressWarnings("unused")
-    private void allCellsAssigned(Board.AllCellsAssigned allCellsAssigned) {
-        log().info("All cells assigned");
-    }
-
     private void initializeBoardFromGrid(Grid grid) {
         ActorRef board = getContext().actorOf(BoardActor.props(), String.format("board-%d", ++boardNumber));
 
         for (int row = 1; row <= 9; row++) {
             for (int col = 1; col <= 9; col++) {
-                int value = grid.cell(row, col).value;
+                int value = grid.get(row, col).value;
                 if (value > 0) {
                     String who = String.format("Initialize cell (%d, %d) = %d", row, col, value);
                     Cell.SetCell setCell = new Cell.SetCell(row, col, value, who);
@@ -59,7 +62,7 @@ class SudokuActor extends AbstractLoggingActor {
         }
     }
 
-    static Props props(Grid grid) {
-        return Props.create(SudokuActor.class, () -> new SudokuActor(grid));
+    static Props props() {
+        return Props.create(SudokuActor.class);
     }
 }

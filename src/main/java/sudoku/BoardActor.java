@@ -32,26 +32,30 @@ class BoardActor extends AbstractLoggingActor {
                 .match(Board.AllCellsAssigned.class, this::allCellsAssigned)
                 .match(Cell.Invalid.class, this::cellInvalid)
                 .match(Validate.Invalid.class, this::boardInvalid)
-                .match(Validate.Valid.class, this::boardValid)
+                .match(Validate.ValidBoard.class, this::boardValid)
                 .match(Board.Stalled.class, this::boardStalled)
                 .match(Clone.Board.class, this::cloneBoard)
+                .match(Board.Stop.class, this::boardStop)
                 .build();
 
         solved = receiveBuilder()
                 .match(Cell.SetCell.class, this::setCellNotRunning)
                 .match(Board.AllCellsAssigned.class, this::allCellsAssignedSolved)
                 .match(Validate.Invalid.class, this::boardInvalid)
-                .match(Validate.Valid.class, this::boardValid)
+                .match(Validate.ValidBoard.class, this::boardValid)
+                .match(Board.Stop.class, this::boardStop)
                 .build();
 
         failed = receiveBuilder()
                 .match(Cell.SetCell.class, this::setCellNotRunning)
                 .match(Validate.Invalid.class, this::boardInvalidAlreadyFailed)
+                .match(Board.Stop.class, this::boardStop)
                 .build();
 
         stalled = receiveBuilder()
                 .match(Cell.SetCell.class, this::boardStalledBreakStall)
                 .match(Clone.Board.class, this::cloneBoard)
+                .match(Board.Stop.class, this::boardStop)
                 .build();
     }
 
@@ -73,14 +77,12 @@ class BoardActor extends AbstractLoggingActor {
     @SuppressWarnings("unused")
     private void allCellsAssigned(Board.AllCellsAssigned allCellsAssigned) {
         log().info("All cells assigned");
-        become(State.solved);
-//        getContext().getParent().tell(allCellsAssigned, getSelf());
     }
 
-    private void boardValid(Validate.Valid valid) {
-        log().info("Board solved");
+    private void boardValid(Validate.ValidBoard validBoard) {
+        log().info("Board solved {}", validBoard);
         become(State.solved);
-        getContext().getParent().tell(valid, getSelf());
+        getContext().getParent().tell(new Board.Solved(validBoard.grid), getSelf());
     }
 
     private void boardInvalid(Validate.Invalid invalid) {
@@ -103,8 +105,8 @@ class BoardActor extends AbstractLoggingActor {
     private void setCellNotRunning(Cell.SetCell setCell) {
     }
 
+    @SuppressWarnings("unused")
     private void allCellsAssignedSolved(Board.AllCellsAssigned allCellsAssigned) {
-        log().info("Board solved {}, sender {}", allCellsAssigned, getSender());
     }
 
     private void boardStalled(Board.Stalled boardStalled) {
@@ -139,6 +141,17 @@ class BoardActor extends AbstractLoggingActor {
                 getContext().become(stalled);
                 break;
         }
+    }
+
+    @SuppressWarnings("unused")
+    private void boardStop(Board.Stop stop) {
+        log().debug("Stop board");
+        getContext().stop(getSelf());
+    }
+
+    @Override
+    public void postStop() {
+        log().debug("Stopped board");
     }
 
     static Props props() {

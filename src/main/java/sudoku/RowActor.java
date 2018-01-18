@@ -9,7 +9,7 @@ import java.util.List;
 class RowActor extends AbstractLoggingActor {
     private final int row;
     private final int monitoredValue;
-    private List<Cell.Basic> monitoredCells = new ArrayList<>();
+    private List<Cell.Detail> monitoredCells = new ArrayList<>();
 
     private RowActor(int row, int monitoredValue) {
         this.row = row;
@@ -26,7 +26,7 @@ class RowActor extends AbstractLoggingActor {
     @Override
     public void preStart() {
         for (int col = 1; col <= 9; col++) {
-            monitoredCells.add(new Cell.Basic(row, col, monitoredValue));
+            monitoredCells.add(new Cell.Detail(row, col, monitoredValue));
         }
     }
 
@@ -39,7 +39,7 @@ class RowActor extends AbstractLoggingActor {
         if (monitoredCells.isEmpty()) {
             monitoringComplete();
         } else if (monitoredCells.size() == 1) {
-            Cell.Basic cell = monitoredCells.get(0);
+            Cell.Detail cell = monitoredCells.get(0);
             String who = String.format("Set by row (%d) = %d", row, cell.value);
             getSender().tell(new Cell.SetCell(cell.row, cell.col, monitoredValue, who), getSelf());
             monitoringComplete();
@@ -50,7 +50,7 @@ class RowActor extends AbstractLoggingActor {
         return setCell.row == row;
     }
 
-    private boolean isInCol(Cell.SetCell setCell, Cell.Basic cell) {
+    private boolean isInCol(Cell.SetCell setCell, Cell.Detail cell) {
         return setCell.col == cell.col;
     }
 
@@ -91,7 +91,7 @@ class RowActor extends AbstractLoggingActor {
         return boxFor(setCell.row, setCell.col);
     }
 
-    private int boxFor(Cell.Basic cell) {
+    private int boxFor(Cell.Detail cell) {
         return boxFor(cell.row, cell.col);
     }
 

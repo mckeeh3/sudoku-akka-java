@@ -20,9 +20,9 @@ class GridTest {
 
         Grid grid = new Grid(values);
 
-        assertEquals(2, grid.cell(1, 1).value);
-        assertEquals(3, grid.cell(5, 6).value);
-        assertEquals(4, grid.cell(9, 9).value);
+        assertEquals(2, grid.get(1, 1).value);
+        assertEquals(3, grid.get(5, 6).value);
+        assertEquals(4, grid.get(9, 9).value);
 
         System.err.println(grid);
     }
@@ -44,8 +44,18 @@ class GridTest {
 
         for (int row = 1; row <= 9; row++) {
             for (int col = 1; col <= 9; col++) {
-                assertNotNull(grid.cell(row, col));
+                assertNotNull(grid.get(row, col));
             }
         }
+    }
+
+    @Test
+    void setAndGetWorks() {
+        Grid grid = new Grid();
+
+        assertEquals(0, grid.get(5,5).value);
+
+        grid.set(5, 5, 5);
+        assertEquals(5, grid.get(5,5).value);
     }
 }

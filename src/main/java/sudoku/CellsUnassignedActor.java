@@ -95,7 +95,7 @@ class CellsUnassignedActor extends AbstractLoggingActor {
 
     private void checkIfStalled() {
         if (cellCountNoChange >= cellCount) {
-            log().debug("Cell stalled, cell unsolved {} stalled {}", cellCount, cellCountNoChange);
+            log().debug("Cell stalled, get unsolved {} stalled {}", cellCount, cellCountNoChange);
 
             getContext().getParent().tell(new Board.Stalled(), getSelf());
             getContext().become(stalled);

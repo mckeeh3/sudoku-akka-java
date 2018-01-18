@@ -10,7 +10,7 @@ class BoxActor extends AbstractLoggingActor {
     private final int row;
     private final int col;
     private final int monitoredValue;
-    private List<Cell.Basic> monitoredCells = new ArrayList<>();
+    private List<Cell.Detail> monitoredCells = new ArrayList<>();
     private final int boxIndex;
 
     private BoxActor(int row, int col, int monitoredValue) {
@@ -33,7 +33,7 @@ class BoxActor extends AbstractLoggingActor {
         for (int r = 1; r <= 9; r++) {
             for (int c = 1; c <= 9; c++) {
                 if (boxIndex == boxFor(r, c)) {
-                    monitoredCells.add(new Cell.Basic(r, c, monitoredValue));
+                    monitoredCells.add(new Cell.Detail(r, c, monitoredValue));
                 }
             }
         }
@@ -50,7 +50,7 @@ class BoxActor extends AbstractLoggingActor {
         if (monitoredCells.isEmpty()) {
             monitoringComplete();
         } else if (monitoredCells.size() == 1) {
-            Cell.Basic cell = monitoredCells.get(0);
+            Cell.Detail cell = monitoredCells.get(0);
             String who = String.format("Set by box (%d, %d) = %d", row, col, monitoredValue);
             getSender().tell(new Cell.SetCell(cell.row, cell.col, monitoredValue, who), getSelf());
             monitoringComplete();
@@ -72,7 +72,7 @@ class BoxActor extends AbstractLoggingActor {
         return boxIndex == boxFor(setCell.row, setCell.col);
     }
 
-    private boolean isSameCell(Cell.SetCell setCell, Cell.Basic cell) {
+    private boolean isSameCell(Cell.SetCell setCell, Cell.Detail cell) {
         return cell.row == setCell.row && cell.col == setCell.col;
     }
 

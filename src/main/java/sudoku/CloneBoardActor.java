@@ -10,7 +10,7 @@ class CloneBoardActor extends AbstractLoggingActor {
     private final Receive beforeSplit;
     private final Receive afterSplit;
 
-    CloneBoardActor(int boardNumber) {
+    private CloneBoardActor(int boardNumber) {
         this.boardNumber = boardNumber;
 
         beforeSplit = receiveBuilder()

@@ -8,6 +8,7 @@ class ValidateBoardActor extends AbstractLoggingActor {
     private final ActorRef validateRows;
     private final ActorRef validateColumns;
     private final ActorRef validateBoxes;
+    private final Grid grid;
 
     private int validRowColBox = 0;
 
@@ -15,6 +16,8 @@ class ValidateBoardActor extends AbstractLoggingActor {
         validateRows = getContext().actorOf(ValidateRowsActor.props(), "validateRows");
         validateColumns = getContext().actorOf(ValidateColumnsActor.props(), "validateColumns");
         validateBoxes = getContext().actorOf(ValidateBoxesActor.props(), "validateBoxes");
+
+        grid = new Grid();
     }
 
     @Override
@@ -28,10 +31,12 @@ class ValidateBoardActor extends AbstractLoggingActor {
     }
 
     private void setCell(Cell.SetCell setCell) {
-        validateCell(new Cell.Basic(setCell.row, setCell.col, setCell.value));
+        grid.set(setCell.row, setCell.col, setCell.value);
+
+        validateCell(new Cell.Detail(setCell.row, setCell.col, setCell.value));
     }
 
-    private void validateCell(Cell.Basic cell) {
+    private void validateCell(Cell.Detail cell) {
         validateRows.tell(cell, getSelf());
         validateColumns.tell(cell, getSelf());
         validateBoxes.tell(cell, getSelf());
@@ -41,7 +46,7 @@ class ValidateBoardActor extends AbstractLoggingActor {
     private void validRowColBox(Validate.Valid valid) {
         validRowColBox++;
         if (validRowColBox == 3) {
-            getContext().getParent().tell(new Validate.Valid("Board solved"), getSelf());
+            getContext().getParent().tell(new Validate.ValidBoard("Board solved", grid), getSelf());
         }
     }
 
