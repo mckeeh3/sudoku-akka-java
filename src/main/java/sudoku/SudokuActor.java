@@ -20,7 +20,6 @@ class SudokuActor extends AbstractLoggingActor {
     }
 
     private void solveBoard(Grid grid) {
-        log().info("Solve board {}", grid);
         runner = getSender();
         initializeBoardFromGrid(grid);
     }
@@ -32,9 +31,11 @@ class SudokuActor extends AbstractLoggingActor {
         getContext().getChildren().forEach(child -> child.tell(new Board.Stop(), getSelf()));
     }
 
-    private void boardInvalid(Board.Invalid invalid) {
-        log().info("Board invalid {}", System.currentTimeMillis() - timeStart);
-        runner.tell(invalid, getSelf());
+    private void boardInvalid(Board.Invalid boardInvalid) {
+        log().info("Board invalid {} ms, {}, {}", System.currentTimeMillis() - timeStart, getSender().path().name(), boardInvalid);
+//        runner.tell(boardInvalid, getSelf());
+        getContext().stop(getSender());
+        getContext().getChildren().forEach(child -> log().debug("{}", child.path().name()));
     }
 
     @SuppressWarnings("unused")
@@ -42,9 +43,9 @@ class SudokuActor extends AbstractLoggingActor {
         log().info("Board stalled, sender {}", getSender());
         ActorRef board = getContext().actorOf(BoardActor.props(), String.format("board-%d", ++boardNumber));
 
-        Clone.Boards boards = new Clone.Boards(getSender(), board);
-        ActorRef cloneBoards = getContext().actorOf(CloneBoardActor.props(boardNumber), String.format("cloneBoard-%d", boardNumber));
-        cloneBoards.tell(boards, getSelf());
+        Clone.Boards cloneBoards = new Clone.Boards(getSender(), board);
+        ActorRef cloneBoard = getContext().actorOf(CloneBoardActor.props(boardNumber), String.format("cloneBoard-%d", boardNumber));
+        cloneBoard.tell(cloneBoards, getSelf());
     }
 
     private void initializeBoardFromGrid(Grid grid) {

@@ -24,10 +24,15 @@ interface Board {
     }
 
     class Invalid implements Serializable {
-        final Cell.Invalid invalid;
+        final String message;
 
-        Invalid(Cell.Invalid invalid) {
-            this.invalid = invalid;
+        Invalid(String message) {
+            this.message = message;
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s[%s]", getClass().getSimpleName(), message);
         }
     }
 
@@ -42,6 +47,34 @@ interface Board {
         @Override
         public String toString() {
             return String.format("%s[]", getClass().getSimpleName());
+        }
+    }
+
+    class Cell implements Serializable {
+        final int row;
+        final int col;
+        final int value;
+        final String who;
+
+        Cell(int row, int col, int value) {
+            this.row = row;
+            this.col = col;
+            this.value = value;
+            who = null;
+        }
+
+        Cell(int row, int col, int value, String who) {
+            this.row = row;
+            this.col = col;
+            this.value = value;
+            this.who = who;
+        }
+
+        @Override
+        public String toString() {
+            return who == null || who.trim().isEmpty()
+                    ? String.format("%s[(%d, %d) = %d]", getClass().getSimpleName(), row, col, value)
+                    : String.format("%s[(%d, %d) = %d, '%s']", getClass().getSimpleName(), row, col, value, who);
         }
     }
 }

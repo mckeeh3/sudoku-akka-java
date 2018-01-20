@@ -33,10 +33,10 @@ class ValidateBoardActor extends AbstractLoggingActor {
     private void setCell(Cell.SetCell setCell) {
         grid.set(setCell.row, setCell.col, setCell.value);
 
-        validateCell(new Cell.Detail(setCell.row, setCell.col, setCell.value));
+        validateCell(new Board.Cell(setCell.row, setCell.col, setCell.value));
     }
 
-    private void validateCell(Cell.Detail cell) {
+    private void validateCell(Board.Cell cell) {
         validateRows.tell(cell, getSelf());
         validateColumns.tell(cell, getSelf());
         validateBoxes.tell(cell, getSelf());

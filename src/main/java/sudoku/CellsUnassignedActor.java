@@ -90,16 +90,17 @@ class CellsUnassignedActor extends AbstractLoggingActor {
     private void cellStopped(Terminated terminated) {
         cellCount--;
         checkIfStalled();
-//        log().debug("Cell stopped ({}) {}", cellCount, terminated);
     }
 
     private void checkIfStalled() {
-        if (cellCountNoChange >= cellCount) {
-            log().debug("Cell stalled, get unsolved {} stalled {}", cellCount, cellCountNoChange);
+        if (cellCountNoChange >= cellCount && cellCount > 0) {
+            log().debug("Cells stalled, get unsolved {} stalled {}", cellCount, cellCountNoChange);
 
             getContext().getParent().tell(new Board.Stalled(), getSelf());
             getContext().become(stalled);
-        }
+        } else if (cellCountNoChange >= cellCount - 3 && cellCount > 0) {
+            log().debug("Stall gap closing {} count, {} no change", cellCount, cellCountNoChange);
+        } // TODO else if is temp debug
     }
 
     private void cloneBoard(Clone.Board cloneBoard) {

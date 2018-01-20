@@ -21,11 +21,11 @@ class ValidateRowActor extends AbstractLoggingActor {
     @Override
     public Receive createReceive() {
         return receiveBuilder()
-                .match(Cell.Detail.class, this::validateCell)
+                .match(Board.Cell.class, this::validateCell)
                 .build();
     }
 
-    private void validateCell(Cell.Detail cell) {
+    private void validateCell(Board.Cell cell) {
         if (isInRow(cell)) {
             if (!values.removeIf(value -> value == cell.value)) {
                 getSender().tell(new Validate.Invalid(String.format("Invalid row %d, %s", row, cell)), getSelf());
@@ -37,7 +37,7 @@ class ValidateRowActor extends AbstractLoggingActor {
         }
     }
 
-    private boolean isInRow(Cell.Detail cell) {
+    private boolean isInRow(Board.Cell cell) {
         return row == cell.row;
     }
 

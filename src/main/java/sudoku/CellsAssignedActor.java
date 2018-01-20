@@ -24,15 +24,12 @@ class CellsAssignedActor extends AbstractLoggingActor {
     }
 
     private void setCell(Cell.SetCell setCell) {
-        Optional<ActorRef> cellAssigned = getContext().findChild(cellName(setCell));
+        String cellName = cellName(setCell);
+        Optional<ActorRef> cellAssigned = getContext().findChild(cellName);
 
-//        if (cellAssigned.isPresent()) {
-//            log().debug("Already assigned {}", setCell);
-//        } else {
         if (!cellAssigned.isPresent()) {
             log().debug("Assign {}", setCell);
-            String name = cellName(setCell);
-            getContext().actorOf(CellAssignedActor.props(setCell.row, setCell.col, setCell.value, setCell.who), name);
+            getContext().actorOf(CellAssignedActor.props(setCell.row, setCell.col, setCell.value, setCell.who), cellName);
             validateBoard.tell(setCell, getSelf());
         }
     }

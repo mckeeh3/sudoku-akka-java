@@ -49,32 +49,4 @@ interface Cell {
             return String.format("%s[(%d, %d) = %d, '%s']", getClass().getSimpleName(), row, col, value, who);
         }
     }
-
-    class Detail implements Serializable {
-        final int row;
-        final int col;
-        final int value;
-        final String who;
-
-        Detail(int row, int col, int value) {
-            this.row = row;
-            this.col = col;
-            this.value = value;
-            who = null;
-        }
-
-        Detail(int row, int col, int value, String who) {
-            this.row = row;
-            this.col = col;
-            this.value = value;
-            this.who = who;
-        }
-
-        @Override
-        public String toString() {
-            return who == null || who.trim().isEmpty()
-                    ? String.format("%s[(%d, %d) = %d]", getClass().getSimpleName(), row, col, value)
-                    : String.format("%s[(%d, %d) = %d, '%s']", getClass().getSimpleName(), row, col, value, who);
-        }
-    }
 }

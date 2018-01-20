@@ -125,7 +125,20 @@ public class Sudoku {
                         " ,9,8, , ,5, , , ," +
                         " , , ,1, , ,2, , ";
 
-        Grid grid = new Grid(args.length == 0 ? diabolical02 : args[0]);
+        final String diabolical03 =
+                "         , , , , ,6, ,3,7," +
+                        "1, , , , , , , , ," +
+                        " , ,6, ,4, , , , ," +
+                        " ,7, , , , , ,2,8," +
+                        "3, , ,4, , , , , ," +
+                        " ,2, ,3,8, , ,1, ," +
+                        "7,9, ,8, , , , , ," +
+                        " , , ,9, ,4, , ,3," +
+                        " ,5, , , , ,4, ,2";
+
+        Grid grid = new Grid(args.length == 0 ? diabolical03 : args[0]);
+        System.out.println("Solve board");
+        System.out.println(grid);
 
         ActorSystem actorSystem = ActorSystem.create("Sudoku");
 
@@ -136,6 +149,7 @@ public class Sudoku {
         CompletableFuture<Object> responseCF = PatternsCS.ask(sudoku, grid, timeout).toCompletableFuture();
 
         showResult(startTime, responseCF);
+        actorSystem.terminate();
     }
 
     private static void showResult(long startTime, CompletableFuture<Object> responseCF) {
@@ -147,6 +161,8 @@ public class Sudoku {
 
                 System.out.printf("Board solved %d ms%n", System.currentTimeMillis() - startTime);
                 System.out.println(boardSolved.grid);
+            } else {
+                System.out.printf("Board not solved, %s%n", response);
             }
         } catch (InterruptedException | ExecutionException e) {
             e.printStackTrace();

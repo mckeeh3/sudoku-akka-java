@@ -31,7 +31,7 @@ class CloneBoardActor extends AbstractLoggingActor {
     }
 
     private void cloneBoards(Clone.Boards boards) {
-        log().info("Clone board {} to {}", boardNumber - 1, boardNumber);
+        log().info("Clone board #{} from {}, to {}", boardNumber, boards.boardFrom.path().name(), boards.boardTo.path().name());
         this.boards = boards;
 
         boards.boardFrom.tell(new Clone.Board(), getSelf());

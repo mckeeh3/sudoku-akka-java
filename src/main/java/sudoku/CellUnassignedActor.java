@@ -93,7 +93,7 @@ class CellUnassignedActor extends AbstractLoggingActor {
     }
 
     private void cellSetByThisCell() {
-        String who = String.format("Set by cell (%d, %d) = %d", row, col, possibleValues.get(0));
+        String who = String.format("Set by cell (%d, %d)", row, col);
         getSender().tell(new Cell.SetCell(row, col, possibleValues.get(0), who), getSelf());
         getContext().stop(getSelf());
     }

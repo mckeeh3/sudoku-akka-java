@@ -65,8 +65,6 @@ class BoardActor extends AbstractLoggingActor {
     }
 
     private void setCell(Cell.SetCell setCell) {
-        log().debug("{}", setCell);
-
         cellsAssigned.tell(setCell, getSelf());
         cellsUnassigned.tell(setCell, getSelf());
         rows.tell(setCell, getSelf());
@@ -88,7 +86,7 @@ class BoardActor extends AbstractLoggingActor {
     private void boardInvalid(Validate.Invalid invalid) {
         log().info("Board invalid {}", invalid);
         become(State.failed);
-        getContext().getParent().tell(invalid, getSelf());
+        getContext().getParent().tell(new Board.Invalid(invalid.message), getSelf());
     }
 
     @SuppressWarnings("unused")
@@ -98,7 +96,7 @@ class BoardActor extends AbstractLoggingActor {
     private void cellInvalid(Cell.Invalid invalid) {
         log().info("{}", invalid);
         become(State.failed);
-        getContext().getParent().tell(new Board.Invalid(invalid), getSelf());
+        getContext().getParent().tell(new Board.Invalid(invalid.toString()), getSelf());
     }
 
     @SuppressWarnings("unused")
