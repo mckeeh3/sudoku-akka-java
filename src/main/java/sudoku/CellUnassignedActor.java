@@ -35,7 +35,7 @@ class CellUnassignedActor extends AbstractLoggingActor {
 //        log().debug("{} {}", setCell, possibleValues);
 
         if (isSameCell(setCell)) {
-            cellSetByBoardRowColOrBox();
+            cellSetBySameCell();
         } else if (isSameRowColOrBox(setCell)) {
             trimPossibleValues(setCell);
         }
@@ -88,7 +88,7 @@ class CellUnassignedActor extends AbstractLoggingActor {
         }
     }
 
-    private void cellSetByBoardRowColOrBox() {
+    private void cellSetBySameCell() {
         getContext().stop(getSelf());
     }
 

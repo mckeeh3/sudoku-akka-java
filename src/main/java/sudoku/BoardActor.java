@@ -108,7 +108,7 @@ class BoardActor extends AbstractLoggingActor {
     }
 
     private void boardStalled(Board.Stalled boardStalled) {
-        log().info("Board stalled {}, sender {}", boardStalled, getSender());
+        log().info("Board stalled {}, sender {}", boardStalled, getSender().path().name());
         getContext().getParent().tell(boardStalled, getSelf());
         become(State.stalled);
     }
@@ -143,7 +143,7 @@ class BoardActor extends AbstractLoggingActor {
 
     @SuppressWarnings("unused")
     private void boardStop(Board.Stop stop) {
-        log().debug("Stop board");
+        log().debug("Stop {}", getSelf().path().name());
         getContext().stop(getSelf());
     }
 

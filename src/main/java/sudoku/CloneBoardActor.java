@@ -17,11 +17,13 @@ class CloneBoardActor extends AbstractLoggingActor {
                 .match(Clone.Boards.class, this::cloneBoards)
                 .match(Clone.CloneAssigned.class, this::cloneAssigned)
                 .match(Clone.CloneUnassigned.class, this::cloneUnassignedBeforeSplit)
+                .match(Board.Stop.class, this::boardStop)
                 .build();
 
         afterSplit = receiveBuilder()
                 .match(Clone.CloneAssigned.class, this::cloneAssigned)
                 .match(Clone.CloneUnassigned.class, this::cloneUnassignedAfterSplit)
+                .match(Board.Stop.class, this::boardStop)
                 .build();
     }
 
@@ -73,6 +75,12 @@ class CloneBoardActor extends AbstractLoggingActor {
 
     @SuppressWarnings("unused")
     private void cloneUnassignedAfterSplit(Clone.CloneUnassigned cloneUnassigned) {
+    }
+
+    @SuppressWarnings("unused")
+    private void boardStop(Board.Stop stop) {
+        log().debug("Stop {}", getSelf().path().name());
+        getContext().stop(getSelf());
     }
 
     static Props props(int boardNumber) {
