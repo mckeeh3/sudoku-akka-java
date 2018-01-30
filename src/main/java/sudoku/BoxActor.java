@@ -40,8 +40,6 @@ class BoxActor extends AbstractLoggingActor {
     }
 
     private void setCell(Cell.SetCell setCell) {
-//        List<Cell> mc = new ArrayList<>(monitoredCells);
-
         removeCellFromBoxSameValue(setCell);
         removeCellFromBoxAnyValue(setCell);
         removeCellFromRow(setCell);
@@ -55,11 +53,6 @@ class BoxActor extends AbstractLoggingActor {
             getSender().tell(new Cell.SetCell(cell.row, cell.col, monitoredValue, who), getSelf());
             monitoringComplete();
         }
-
-//        if (monitoredCells.size() != mc.size()) {
-//            String msg = String.format("%s trimmed (%d)%s -> (%d)%s", setCell, mc.size(), mc, monitoredCells.size(), monitoredCells);
-//            log().debug("{}", msg);
-//        }
     }
 
     private int boxFor(int row, int col) {

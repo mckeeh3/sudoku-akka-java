@@ -1,6 +1,8 @@
 package sudoku;
 
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 interface Cell {
     class Invalid implements Serializable {
@@ -15,19 +17,6 @@ interface Cell {
         @Override
         public String toString() {
             return String.format("%s[(%d, %d)]", getClass().getSimpleName(), row, col);
-        }
-    }
-
-    class NoChange implements Serializable {
-        final SetCell setCell;
-
-        NoChange(SetCell setCell) {
-            this.setCell = setCell;
-        }
-
-        @Override
-        public String toString() {
-            return String.format("%s[%s]", getClass().getSimpleName(), setCell);
         }
     }
 
@@ -47,6 +36,23 @@ interface Cell {
         @Override
         public String toString() {
             return String.format("%s[(%d, %d) = %d, '%s']", getClass().getSimpleName(), row, col, value, who);
+        }
+    }
+
+    class Ack implements Serializable {
+        final int row;
+        final int col;
+        final List<Integer> possibleValues;
+
+        Ack(int row, int col, List<Integer> possibleValues) {
+            this.row = row;
+            this.col = col;
+            this.possibleValues = new ArrayList<>(possibleValues);
+        }
+
+        @Override
+        public String toString() {
+            return String.format("%s[(%d, %d) %s]", getClass().getSimpleName(), row, col, possibleValues);
         }
     }
 }

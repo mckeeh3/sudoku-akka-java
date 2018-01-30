@@ -10,13 +10,13 @@ import java.util.List;
 class CellUnassignedActor extends AbstractLoggingActor {
     private final int row;
     private final int col;
+    private final int box;
     private final List<Integer> possibleValues;
-    private final int boxIndex;
 
     private CellUnassignedActor(int row, int col) {
         this.row = row;
         this.col = col;
-        boxIndex = boxFor(row, col);
+        box = boxFor(row, col);
 
         possibleValues = new ArrayList<>();
         Collections.addAll(possibleValues, 1, 2, 3, 4, 5, 6, 7, 8, 9);
@@ -31,21 +31,13 @@ class CellUnassignedActor extends AbstractLoggingActor {
     }
 
     private void setCell(Cell.SetCell setCell) {
-//        List<Integer> pv = new ArrayList<>(possibleValues);
-//        log().debug("{} {}", setCell, possibleValues);
-
         if (isSameCell(setCell)) {
-            cellSetBySameCell();
+            possibleValues.clear();
         } else if (isSameRowColOrBox(setCell)) {
             trimPossibleValues(setCell);
         }
 
-        checkPossibleValues(setCell);
-
-//        if (possibleValues.size() != pv.size()) {
-//            String msg = String.format("%s trimmed (%d)%s -> (%d)%s", setCell, pv.size(), pv, possibleValues.size(), possibleValues);
-//            log().debug("{}", msg);
-//        }
+        getContext().getParent().tell(new Cell.Ack(row, col, possibleValues), getSelf());
     }
 
     private boolean isSameCell(Cell.SetCell setCell) {
@@ -65,7 +57,7 @@ class CellUnassignedActor extends AbstractLoggingActor {
     }
 
     private boolean isSameBox(Cell.SetCell setCell) {
-        return boxIndex == boxFor(setCell.row, setCell.col);
+        return box == boxFor(setCell.row, setCell.col);
     }
 
     private int boxFor(int row, int col) {
@@ -76,30 +68,6 @@ class CellUnassignedActor extends AbstractLoggingActor {
 
     private void trimPossibleValues(Cell.SetCell setCell) {
         possibleValues.removeIf(value -> value == setCell.value);
-    }
-
-    private void checkPossibleValues(Cell.SetCell setCell) {
-        if (possibleValues.size() == 1) {
-            cellSetByThisCell();
-        } else if (possibleValues.isEmpty()) {
-            cellIsInvalid();
-        } else {
-            getContext().getParent().tell(new Cell.NoChange(setCell), getSelf());
-        }
-    }
-
-    private void cellSetBySameCell() {
-        getContext().stop(getSelf());
-    }
-
-    private void cellSetByThisCell() {
-        String who = String.format("Set by cell (%d, %d)", row, col);
-        getSender().tell(new Cell.SetCell(row, col, possibleValues.get(0), who), getSelf());
-        getContext().stop(getSelf());
-    }
-
-    private void cellIsInvalid() {
-        getSender().tell(new Cell.Invalid(row, col), getSelf());
     }
 
     @SuppressWarnings("unused")

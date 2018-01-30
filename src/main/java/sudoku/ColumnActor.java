@@ -31,8 +31,6 @@ class ColumnActor extends AbstractLoggingActor {
     }
 
     private void setCell(Cell.SetCell setCell) {
-//        List<Cell> mc = new ArrayList<>(monitoredCells);
-
         removeInRow(setCell);
         removeInCol(setCell);
         removeInBox(setCell);
@@ -46,11 +44,6 @@ class ColumnActor extends AbstractLoggingActor {
             getSender().tell(new Cell.SetCell(cell.row, cell.col, monitoredValue, who), getSelf());
             monitoringComplete();
         }
-
-//        if (mc.size() != monitoredCells.size()) {
-//            String msg = String.format("(%d)%s -> (%d)%s ", mc.size(), mc, monitoredCells.size(), monitoredCells);
-//            log().debug("{} trimmed {}", setCell, msg);
-//        }
     }
 
     private boolean isInRow(Cell.SetCell setCell, Board.Cell cell) {

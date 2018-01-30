@@ -10,7 +10,7 @@ class CellsAssignedActor extends AbstractLoggingActor {
     private final ActorRef validateBoard;
 
     {
-        validateBoard = getContext().actorOf(ValidateBoardActor.props(), "validate-board");
+        validateBoard = getContext().actorOf(ValidateBoardActor.props(), "validateBoard");
     }
 
     @Override
@@ -51,6 +51,6 @@ class CellsAssignedActor extends AbstractLoggingActor {
     }
 
     private String cellName(Cell.SetCell setCell) {
-        return String.format("assigned-row-%d-col-%d", setCell.row, setCell.col);
+        return String.format("assigned-%d-%d", setCell.row, setCell.col);
     }
 }
